@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="compile">
+	<!-- define global properties for this build -->
+	<property name="src" location="src"/>
+	<property name="build" location="bin"/>
+	
+	<!-- Task definition for JavaNCSS (checks NCSS and CCN on source code) -->
+	<taskdef name="javancss" classname="javancss.JavancssAntTask"/>
+	
+	<!-- Task for checkstyle (checks source code to keep coding standards) -->
+	<taskdef resource="checkstyletask.properties"/>
+	
+	<!-- Compile java code from ${src} to ${build} -->
+	<target name="compile" description="compile the source to ${build}">
+		<javac srcdir="${src}" destdir="${build}"/>
+	</target>
+	
+	<!-- creates xbrlcore.jar -->
+	<target name="createXbrlCoreJar" description="creates a JAR file of xbrlcore">
+		<delete file="jar/xbrlcore.jar"/>
+		<jar basedir="${build}" destfile="jar/xbrlcore.jar" includes="xbrlcore/**" excludes="xbrlcore/junit/**"/>
+	</target>
+	
+	<!-- creates bundesbank-baselsolv.jar -->
+	<target name="createBundesbankBaselsolvJar" description="creates the JAR file bundesbank-baselsolv.jar">
+		<delete file="jar/bundesbank-baselsolv.jar"/>
+		<jar basedir="${build}" destfile="jar/bundesbank-baselsolv.jar" includes="de/bundesbank/baselsolv/**" excludes="de/bundesbank/baselsolv/junit/**"/>
+	</target>
+	
+	<!-- creates a javadoc api of xbrlcore -->
+	<target name="xbrlcoreDoc" description="generates the javadoc files of xbrlcore">
+		<delete includeemptydirs="true">
+			<fileset dir="api/xbrlcore" includes="**/*"/>
+		</delete>
+		<javadoc packagenames="xbrlcore.*" sourcepath="src" destdir="api/xbrlcore" excludepackagenames="xbrlcore.junit.*"/>
+	</target>
+	
+	<!-- creates a javadoc api of bundesbank-baselsolv -->
+	<target name="bundesbank-baselsolvDoc" description="generates the javadoc files of bundesbank-baselsolv">
+		<delete includeemptydirs="true">
+			<fileset dir="api/bundesbank-baselsolv" includes="**/*"/>
+		</delete>
+		<javadoc packagenames="de.bundesbank.baselsolv.*" sourcepath="src" destdir="api/bundesbank-baselsolv" excludepackagenames="de.bundesbank.baselsolv.junit"/>
+	</target>
+	
+	<!-- creates an output of JavaNCSS for xbrlcore -->
+	<target name="xbrlcore-NCSS" description="generates an output of JavaNCSS for xbrlcore">
+		<javancss srcdir="${src}\xbrlcore" abortOnFail="false" includes="**/*.java" excludes="junit/**/*.java" outputfile="codeReport/javancss/xbrlcore/xbrlcoreNCSS.txt" format="plain" generateReport="true"/>
+	</target>
+	
+	<!-- creates an output of JavaNCSS for bundesbank-baselsolv -->
+	<target name="bundesbank-baselsolv-NCSS" description="generates an output of JavaNCSS for bundesbank-baselsolv">
+		<javancss srcdir="${src}\de\bundesbank\baselsolv" abortOnFail="false" includes="**/*.java" excludes="junit/**/*.java" outputfile="codeReport/javancss/bundesbank-baselsolv/bundesbank-baselsolv-NCSS.txt" format="plain" generateReport="true"/>
+	</target>
+	
+	<!-- checks coding standards of xbrlcore -->
+	<target name="xbrlcore-checkstyle" description="checks coding standards of xbrlcore">
+		<checkstyle config="checkstyle/sun_checks.xml" maxErrors="2147483647">
+			<fileset dir="src/xbrlcore" includes="**/*.java" excludes="junit/**/*.java"/>
+			<formatter type="plain" useFile="true" toFile="codeReport/checkstyle/xbrlcore/xbrlcore-checkstyle.txt"/>
+		</checkstyle>
+	</target>
+	
+	<!-- checks coding standards of bundesbank-baselsolv -->
+	<target name="bundesbank-baselsolv-checkstyle" description="checks coding standards of bundesbank-baselsolv">
+		<checkstyle config="checkstyle/sun_checks.xml" maxErrors="2147483647">
+			<fileset dir="src/de/bundesbank/baselsolv" includes="**/*.java" excludes="junit/**/*.java"/>
+			<formatter type="plain" useFile="true" toFile="codeReport/checkstyle/bundesbank-baselsolv/bundesbank-baselsolv-checkstyle.txt"/>
+		</checkstyle>
+	</target>	
+		
+</project>
+

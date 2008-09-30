@@ -1,0 +1,51 @@
+package xbrlcore.linkbase;
+
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * 
+ * TODO Vielleicht mal über einen allgemeinen Iterator - LinkbaseIterator -
+ * nachdenken.
+ */
+public class PresentationLinkbaseIterator implements Iterator {
+
+	private List elementList;
+
+	private int counter;
+
+	public PresentationLinkbaseIterator(List elementList) {
+		this.elementList = elementList;
+		counter = 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.Iterator#remove()
+	 */
+	public void remove() {
+		/** TODO: not implemented yet * */
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.Iterator#hasNext()
+	 */
+	public boolean hasNext() {
+		if (elementList == null)
+			return false;
+		return counter < elementList.size() ? true : false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.Iterator#next()
+	 */
+	public Object next() {
+		return elementList.get(counter++);
+	}
+
+}
