@@ -1,39 +1,42 @@
 package xbrlcore.junit;
 
-import xbrlcore.junit.base.*;
-import xbrlcore.junit.dimensions.MultipleDimensionTypeTest;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
+import xbrlcore.junit.base.ConceptTest;
+import xbrlcore.junit.base.DTSExtendedLinkbaseTests;
+import xbrlcore.junit.base.DTSFactoryTest;
+import xbrlcore.junit.base.InvalidTaxonomyTest;
 import xbrlcore.junit.dimensions.DimensionTest;
+import xbrlcore.junit.dimensions.MultipleDimensionTypeTest;
 import xbrlcore.junit.instance.FactTest;
 import xbrlcore.junit.instance.InstanceTestTmp;
 import xbrlcore.junit.instance.XBRLInstanceFactoryTest;
 import xbrlcore.junit.instance.XBRLInstanceTest;
-import xbrlcore.junit.linkbase.*;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import xbrlcore.junit.linkbase.CalculationLinkbaseTest;
+import xbrlcore.junit.linkbase.DefinitionLinkbaseTest;
+import xbrlcore.junit.linkbase.LabelLinkbaseTest;
+import xbrlcore.junit.linkbase.PresentationLinkbaseTest;
+import xbrlcore.junit.linkbase.XBRLLinkbaseTest;
 
-public class AllTests {
+/**
+ * This is a test class which runs all JUnit tests registered with this project.
+ * @author Daniel
+ */
+@RunWith(Suite.class)
+@Suite.SuiteClasses( { DTSFactoryTest.class, ConceptTest.class,
+    XBRLLinkbaseTest.class, LabelLinkbaseTest.class,
+    PresentationLinkbaseTest.class, DefinitionLinkbaseTest.class,
+    CalculationLinkbaseTest.class, DTSExtendedLinkbaseTests.class,
+    InvalidTaxonomyTest.class, DimensionTest.class, FactTest.class,
+    XBRLInstanceTest.class, MultipleDimensionTypeTest.class,
+    XBRLInstanceFactoryTest.class, InstanceTestTmp.class })
+public final class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for xbrlcore.junit");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(DTSFactoryTest.class);
-		suite.addTestSuite(ConceptTest.class);
-		suite.addTestSuite(XBRLLinkbaseTest.class);
-		suite.addTestSuite(LabelLinkbaseTest.class);
-		suite.addTestSuite(PresentationLinkbaseTest.class);
-		suite.addTestSuite(DefinitionLinkbaseTest.class);
-		suite.addTestSuite(CalculationLinkbaseTest.class);
-		suite.addTestSuite(DTSExtendedLinkbaseTests.class);
-		suite.addTestSuite(InvalidTaxonomyTest.class);
-		suite.addTestSuite(DimensionTest.class);
-		suite.addTestSuite(FactTest.class);
-		suite.addTestSuite(XBRLInstanceTest.class);
-		suite.addTestSuite(MultipleDimensionTypeTest.class);
-		suite.addTestSuite(XBRLInstanceFactoryTest.class);
-		suite.addTestSuite(InstanceTestTmp.class);
-		
-		//$JUnit-END$
-		return suite;
-	}
-
+    /**
+     * This is a private constructor to prevent the utility class from being
+     * instantiated.
+     */
+    private AllTests() {
+    }
 }
