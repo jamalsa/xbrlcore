@@ -106,11 +106,6 @@ public class InstanceOutputter {
         /* set schemaRef elements */
         resultDocument.getRootElement().addContent(getSchemaRefElement());
 
-        Iterator factSetIterator = factSet.iterator();
-        while (factSetIterator.hasNext()) {
-            resultDocument.getRootElement().addContent(
-                    getFactElement((Fact) factSetIterator.next()));
-        }
         Set contextMapEntrySet = contextMap.entrySet();
         Iterator contextMapIterator = contextMapEntrySet.iterator();
         while (contextMapIterator.hasNext()) {
@@ -128,6 +123,14 @@ public class InstanceOutputter {
             InstanceUnit currUnit = (InstanceUnit) currEntry.getValue();
             resultDocument.getRootElement()
                     .addContent(getUnitElement(currUnit));
+        }
+        
+        //changed by seki : list the facts at the end of the instance
+        //to be more xbrl standard compliant (see FRIS-PWD-2007-11-14 - section 2.1.10)
+        Iterator factSetIterator = factSet.iterator();
+        while (factSetIterator.hasNext()) {
+            resultDocument.getRootElement().addContent(
+                    getFactElement((Fact) factSetIterator.next()));
         }
         return resultDocument;
     }
