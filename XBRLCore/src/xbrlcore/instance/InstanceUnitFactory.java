@@ -1,5 +1,7 @@
 package xbrlcore.instance;
 
+import java.util.Currency;
+
 import xbrlcore.constants.NamespaceConstants;
 
 /**
@@ -26,6 +28,30 @@ public class InstanceUnitFactory {
 		return unit4217EUR;
 	}
 
+	/**
+	 * @param isocode : the ISO 4217 code of the currency, see <a href="http://www.iso.org/iso/support/faqs/faqs_widely_used_standards/widely_used_standards_other/currency_codes/currency_codes_list-1.htm">ISO 4217 codes</a>
+	 * @return an ISO 4217 compliant InstanceUnit
+	 * @author SŽébastien Kirche
+	 */
+	public static InstanceUnit getUnit4217(String isocode) {
+		Currency cur;
+		try {
+			//use the java.util.Currency to check for correctness of the given code
+			cur = Currency.getInstance(isocode); 
+		} catch(IllegalArgumentException e) {
+			cur = null; //TODO throw exception !
+		} catch (NullPointerException e) {
+			cur = null;
+		}
+		if (cur != null){
+			InstanceUnit newUnit = new InstanceUnit(cur.getCurrencyCode());
+			newUnit.setValue(isocode);
+			newUnit.setNamespaceURI(NamespaceConstants.ISO4217_NAMESPACE.getURI());
+			return newUnit;
+		} else
+			return null; //TODO throw exception !
+	}
+	
 	/**
 	 * 
 	 * @return Unit for a pure item type.
