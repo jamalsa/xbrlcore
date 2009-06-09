@@ -49,7 +49,7 @@ public class ExceptionConstants {
     public static final String EX_INSTANCE_CREATION_DIMENSIONS = "Cannot determine dimensional information in context ";
 
     public static final String EX_INSTANCE_CREATION_NOID_CONTEXT = "Cannot create context without ID";
-    
+
     public static final String EX_INSTANCE_CREATION_NO_SCHEMA_PREFIX = "Undefined schema prefix: ";
 
     public static final String EX_INSTANCE_CREATION_NOID_UNIT = "Cannot create unit without ID";

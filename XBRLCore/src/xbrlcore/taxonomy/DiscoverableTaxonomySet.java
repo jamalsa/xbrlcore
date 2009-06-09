@@ -18,7 +18,7 @@ import xbrlcore.linkbase.PresentationLinkbase;
 
 /**
  * This class represents a discoverable taxonomy set (DTS).<br/><br/> A DTS
- * consists of mulitple taxonomies, which themselves consist of a (taxonomy)
+ * consists of multiple taxonomies, which themselves consist of a (taxonomy)
  * schema file and different linkbases. For DTS rules of discovery, see XBRL
  * Spec. section 3. <br/><br/>
  * 

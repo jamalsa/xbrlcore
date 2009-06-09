@@ -67,7 +67,7 @@ public class InstanceFactory {
 
 	/**
 	 * 
-	 * @return Instance of InstanceFactory object.
+     * @return the only Instance of InstanceFactory object (singleton).
 	 */
 	public static synchronized InstanceFactory get() {
 		if (xbrlInstanceFactory == null) {
@@ -100,7 +100,7 @@ public class InstanceFactory {
 		/* determine taxonomy names */
 		Set taxonomyNameSet = getReferencedSchemaNames(xmlInstance);
 
-		/* now build the taxonomys */
+		/* now build the taxonomy */
 		xbrlcore.taxonomy.sax.SAXBuilder xbrlBuilder = new xbrlcore.taxonomy.sax.SAXBuilder();
 		Iterator taxonomyNameSetIterator = taxonomyNameSet.iterator();
 		Set dtsSet = new HashSet();
