@@ -111,9 +111,6 @@ public class Dimension implements Serializable, Cloneable {
     }
 
     /**
-     * TODO: Bad practice: super.clone() is not invoked here. This mehtod clones
-     * the current object and returns the clone.
-     * 
      * @return A clone of the current Dimension object.
      */
     public Object clone() throws CloneNotSupportedException {

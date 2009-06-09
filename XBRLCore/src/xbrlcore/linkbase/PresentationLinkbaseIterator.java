@@ -7,6 +7,8 @@ import java.util.List;
  * 
  * TODO Vielleicht mal über einen allgemeinen Iterator - LinkbaseIterator -
  * nachdenken.
+ * 
+ * @author Daniel Hamm
  */
 public class PresentationLinkbaseIterator implements Iterator {
 
