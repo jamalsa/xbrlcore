@@ -34,7 +34,7 @@ public final class XBRLInstanceFactoryTest {
      */
     @BeforeClass
     public static void setUp() {
-        final String PATH = "xbrl\\instances1.0\\";
+        final String PATH = "xbrl/instances1.0/";
         try {
             InstanceFactory instanceFactory = InstanceFactory.get();
             instance = instanceFactory.createInstance(new File(PATH

@@ -25,10 +25,10 @@ public final class InstanceTestTmp {
         try {
             InstanceFactory f = InstanceFactory.get();
             Instance i = f.createInstance(new File(
-                "xbrl\\test\\baselsolv\\instanz.xml"));
+                "xbrl/test/baselsolv/instanz.xml"));
             assertNotNull(i);
             InstanceValidator iv = new InstanceValidator(new File(
-                "xbrl\\test\\baselsolv\\instanz.xml"));
+                "xbrl/test/baselsolv/instanz.xml"));
             iv.schemaValidation();
             InstanceOutputter io = new InstanceOutputter(i);
             io.getXMLString();
@@ -50,7 +50,7 @@ public final class InstanceTestTmp {
             long start = System.currentTimeMillis();
             InstanceFactory ifa = InstanceFactory.get();
             Instance i = ifa.createInstance(new File(
-                "xbrl\\test\\large_instance\\A_instanz_all.xml"));
+                "xbrl/test/large_instance/A_instanz_all.xml"));
             assertNotNull(i);
             System.out.println(System.currentTimeMillis() - start);
             System.out.println("alles klar");

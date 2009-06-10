@@ -29,7 +29,7 @@ public class CalculationLinkbaseTest {
     /**
      * Path used in this test case.
      */
-    private static String PATH = "xbrl\\test\\linkbase_test\\";
+    private static String PATH = "xbrl/test/linkbase_test/";
 
     /**
      * DTS used in this test case.

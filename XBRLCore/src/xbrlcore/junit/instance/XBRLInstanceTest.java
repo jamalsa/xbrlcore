@@ -252,7 +252,7 @@ public final class XBRLInstanceTest {
      */
     @Test
     public void corepInstance() {
-        final String PATH2 = "xbrl\\test\\corep_instance\\";
+        final String PATH2 = "xbrl/test/corep_instance/";
         try {
             InstanceFactory.get().createInstance(
                 new File(PATH2 + "FW1_instance.xml"));
@@ -326,7 +326,7 @@ public final class XBRLInstanceTest {
                 instance.addContext(_ctx);
                 fail("Exception not thrown");
             } catch (InstanceException ex) {
-                System.out.println("Expected excpetion: " + ex.toString());
+                System.out.println("Expected exception: " + ex.toString());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
