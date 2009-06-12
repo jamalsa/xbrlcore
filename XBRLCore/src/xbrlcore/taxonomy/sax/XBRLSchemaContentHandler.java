@@ -7,6 +7,7 @@
 package xbrlcore.taxonomy.sax;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.jdom.Namespace;
@@ -162,7 +163,29 @@ public class XBRLSchemaContentHandler implements ContentHandler {
 			String qName, Attributes atts) throws SAXException {
 		if (localName.equals("schema")) {
 			String targetNamespaceURI = atts.getValue("targetNamespace");
-			String targetNamespacePrefix = "ns_"
+			//try to get the prefix from the additionnal namespace instead of forging it
+			String targetNamespacePrefix = null;
+			/*
+			for (int i = 0; i < atts.getLength(); i++){
+				if (atts.getQName(i).startsWith("xmlns:")){
+					if (atts.getValue(i).equalsIgnoreCase(targetNamespaceURI)){
+						targetNamespacePrefix = atts.getQName(i).substring(atts.getQName(i).indexOf(':') + 1);
+						break;
+					}
+				}
+			}
+			*/
+		    Iterator ns = namespaceMapping.entrySet().iterator();
+		    while (ns.hasNext()) {
+		        Map.Entry pairs = (Map.Entry)ns.next();
+		        if (pairs.getKey().toString().equalsIgnoreCase(targetNamespaceURI)){
+		        	targetNamespacePrefix = pairs.getValue().toString();
+		        	break;
+		        }
+		    }
+			//if we did not found the "official" prefix, build one
+			if (targetNamespacePrefix == null) 
+				targetNamespacePrefix = "ns_"
 					+ targetNamespaceURI.substring(targetNamespaceURI
 							.lastIndexOf("/") + 1, targetNamespaceURI.length());
 			taxonomySchema.setNamespace(Namespace.getNamespace(
@@ -202,6 +225,7 @@ public class XBRLSchemaContentHandler implements ContentHandler {
 		concept.setTypedDomainRef(atts.getValue("http://xbrl.org/2005/xbrldt",
 				"typedDomainRef"));
 		concept.setTaxonomySchemaName(taxonomyName);
+		concept.setNamespace(taxonomySchema.getNamespace());
 		/** TODO: This exception must be thrown to the invoking method! */
 		try {
 			taxonomySchema.addConcept(concept);

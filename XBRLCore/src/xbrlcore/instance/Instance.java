@@ -40,6 +40,8 @@ public class Instance implements Serializable {
 
 	private Set factSet; /* all facts contained in this instance */
 
+    private Set<Tuple> tupleSet;
+
 	private Map contextMap;
 
 	private Map unitMap;
@@ -70,6 +72,7 @@ public class Instance implements Serializable {
 
 		/* initialise some objects */
 		factSet = new HashSet();
+        tupleSet = new HashSet<Tuple>();
 		additionalNamespaceSet = new HashSet();
 		schemaLocationMap = new HashMap();
 		contextMap = new HashMap();
@@ -158,6 +161,16 @@ public class Instance implements Serializable {
 	}
 
 	/**
+     * Adds a tuple to the instance. 
+     * 
+     * @param newTuple
+     *            The tuple which is added to the instance.
+     */
+    public void addTuple(Tuple newTuple) {
+        tupleSet.add(newTuple);
+    }
+
+    /**
 	 * Adds a new context to the instance. Each context with the same ID can
 	 * only be added once to an instance, an exception is thrown if newContext
 	 * is already part of this instance.
@@ -451,23 +464,21 @@ public class Instance implements Serializable {
 			throw new InstanceException(
 					ExceptionConstants.EX_INSTANCE_FACT_INFORMATION_MISSING);
 		}
-		if (fact.getValue() == null || fact.getValue().length() == 0) {
-			throw new InstanceException(
+        if(!fact.getConcept().isNillable()) {
+	        if (fact.getValue() == null) {
+				throw new InstanceException(
 					ExceptionConstants.EX_INSTANCE_FACT_INFORMATION_MISSING);
-		}
+			}
+        }
 		if (fact.getInstanceContext() == null) {
 			throw new InstanceException(
 					ExceptionConstants.EX_INSTANCE_FACT_INFORMATION_MISSING);
 		}
-		/**
-		 * TODO: If Fact.isNumericItem() is implemented correctly, this has to
-		 * be uncommented
-		 */
-		/*
-		 * if (fact.getConcept().isNumericItem() && fact.getInstanceUnit() ==
-		 * null) { throw new InstanceException(
-		 * ExceptionConstants.EX_INSTANCE_FACT_UNIT_MISSING); }
-		 */
+
+        if (fact.getConcept().isNumericItem() && fact.getInstanceUnit() == null) {
+        	throw new InstanceException(ExceptionConstants.EX_INSTANCE_FACT_UNIT_MISSING);
+        }
+
 		return true;
 	}
 
@@ -649,6 +660,14 @@ public class Instance implements Serializable {
 	}
 
 	/**
+     * @return List with all the tuples in this instance.
+     */
+    public Set getTupleSet() {
+        return tupleSet;
+    }
+
+
+    /**
 	 * @return All taxonomies this instance refers to.
 	 */
 	public Set getDiscoverableTaxonomySet() {

@@ -1,8 +1,10 @@
 package xbrlcore.linkbase;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import xbrlcore.constants.GeneralConstants;
@@ -32,6 +34,41 @@ public class LabelLinkbase extends Linkbase {
 	 */
 	public LabelLinkbase(DiscoverableTaxonomySet dts) {
 		super(dts);
+	}
+
+	/**
+	 * Returns a certain label map of a certain role contained in the label
+	 * linkbase. The map key is the "xlink:role" attribute;  The map value 
+	 * is the label value.
+	 * 
+	 * @param concept
+	 *            The element the label refers to.
+	 * @param lang
+	 *            The language of the label (if NULL, the language is not taken
+	 *            into account).
+	 * @param xbrlExtendedLinkRole
+	 *            The extended link role of the label. If null, the default link
+	 *            role (http://www.xbrl.org/2003/role/link) is taken.
+	 * @return The label matching the parameters. If no label is found, null is
+	 *         returned.
+	 */
+	public Map<String, String> getLabelMap(Concept concept, String lang, String xbrlExtendedLinkRole) {
+		if (concept== null || lang == null || xbrlExtendedLinkRole == null ) {
+			return null;
+		}
+		Map<String, String> labelMap = new HashMap<String, String>();
+		List possibleResults = getTargetExtendedLinkElements(concept, xbrlExtendedLinkRole);
+		Iterator possibleResultsIterator = possibleResults.iterator();
+		while (possibleResultsIterator.hasNext()) {
+			ExtendedLinkElement tmpElement = (ExtendedLinkElement) possibleResultsIterator.next();
+			if (tmpElement.isResource()) {
+				Resource currResource = (Resource) tmpElement;
+				if (currResource.getLang().equals(lang)) {
+					labelMap.put(tmpElement.getRole(), currResource.getValue());
+				}
+			}
+		}
+		return labelMap;
 	}
 
 	/**

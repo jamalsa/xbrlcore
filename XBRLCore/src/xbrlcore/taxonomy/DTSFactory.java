@@ -69,11 +69,9 @@ public class DTSFactory {
 	private static Logger logger = Logger.getLogger(DTSFactory.class);
 
 	private DTSFactory() {
-		if (Thread.currentThread().getContextClassLoader().getResource(
-				"de/bundesbank/baselsolv/log4j.properties") != null) {
+        if (Thread.currentThread().getContextClassLoader().getResource(/*"de/bundesbank/baselsolv/*/"log4j.properties") != null) {
 			PropertyConfigurator.configure(Thread.currentThread()
-					.getContextClassLoader().getResource(
-							"de/bundesbank/baselsolv/log4j.properties"));
+                    .getContextClassLoader().getResource(/*"de/bundesbank/baselsolv/*/"log4j.properties"));
 		}
 	}
 
@@ -174,6 +172,7 @@ public class DTSFactory {
 		while (importedTaxonomiesIterator.hasNext()) {
 			String currTaxonomySchemaName = (String) importedTaxonomiesIterator
 					.next();
+			//TODO: trim the schemaname to keep only after last '/' ?
 			logger.info("Processing taxonomy schema " + currTaxonomySchemaName
 					+ " ... ");
 			TaxonomySchema currTaxSchema = new TaxonomySchema(dts);
@@ -194,9 +193,7 @@ public class DTSFactory {
 
 			/* set concepts */
 			Element rootElement = taxonomySource.getRootElement();
-			List conceptElementList = rootElement.getChildren("element",
-					Namespace.getNamespace("xsd",
-							"http://www.w3.org/2001/XMLSchema"));
+            List conceptElementList = rootElement.getChildren("element", NamespaceConstants.XSD_NAMESPACE);
 			for (int i = 0; i < conceptElementList.size(); i++) {
 				Element currConceptElement = (Element) conceptElementList
 						.get(i);
@@ -211,11 +208,7 @@ public class DTSFactory {
 							.getAttributeValue("substitutionGroup"));
 					currConcept
 							.setPeriodType(currConceptElement
-									.getAttributeValue(
-											"periodType",
-											Namespace
-													.getNamespace("xbrli",
-															"http://www.xbrl.org/2003/instance")));
+                                    .getAttributeValue("periodType", NamespaceConstants.XBRLI_NAMESPACE));
 					currConcept.setAbstract(currConceptElement
 							.getAttribute("abstract") != null
 							&& currConceptElement.getAttributeValue("abstract")
@@ -225,14 +218,54 @@ public class DTSFactory {
 							&& currConceptElement.getAttributeValue("nillable")
 									.equals("true"));
 					currConcept.setTypedDomainRef(currConceptElement
-							.getAttributeValue("typedDomainRef", Namespace
-									.getNamespace("xbrldt",
-											"http://xbrl.org/2005/xbrldt")));
+                            .getAttributeValue("typedDomainRef", NamespaceConstants.XBRLDT_NAMESPACE));
 					currConcept.setTaxonomySchemaName(currTaxSchema.getName());
 					currConcept.setNamespace(currTaxSchema.getNamespace());
 					currTaxSchema.addConcept(currConcept);
 				}
 			}
+
+            /* set roleTypes */
+            Element annotationElement = rootElement.getChild("annotation", NamespaceConstants.XSD_NAMESPACE);
+            if (annotationElement != null) {
+                Element appInfoElement = annotationElement.getChild("appinfo", NamespaceConstants.XSD_NAMESPACE);
+                if (appInfoElement != null) {
+                    List roleTypeElementList = appInfoElement.getChildren("roleType", NamespaceConstants.LINK_NAMESPACE);
+                    for (int i = 0; i < roleTypeElementList.size(); i++) {
+                        Element currRoleTypeElement = (Element) roleTypeElementList.get(i);
+                        String currRoleTypeElementRoleURI = currRoleTypeElement.getAttributeValue("roleURI");
+		                if (currRoleTypeElementRoleURI != null && currRoleTypeElementRoleURI.length() > 0) {
+		                	RoleType roleType = new RoleType();
+		                	roleType.setId(currRoleTypeElement.getAttributeValue("id"));
+		                	roleType.setRoleURI(currRoleTypeElementRoleURI);
+		
+		                	List<String> roleTypeDefinitionList = null;
+		                	List<Element> roleTypeDefinitionElementList = currRoleTypeElement.getChildren("definition", NamespaceConstants.LINK_NAMESPACE);
+		                    if(roleTypeDefinitionElementList != null) {
+		                    	roleTypeDefinitionList = new ArrayList();
+		                        for (int iDefinition = 0; iDefinition < roleTypeDefinitionElementList.size(); iDefinition++) {
+		                            Element currRoleTypeDefinitionElement = (Element) roleTypeDefinitionElementList.get(iDefinition);
+		                            roleTypeDefinitionList.add(currRoleTypeDefinitionElement.getValue());
+		                        }
+		                    }
+		                    roleType.setDefinition(roleTypeDefinitionList);
+		
+		                	List<String> roleTypeUsedOnList = null;
+		                	List<Element> roleTypeUsedOnElementList = currRoleTypeElement.getChildren("usedOn", NamespaceConstants.LINK_NAMESPACE);
+		                    if(roleTypeUsedOnElementList != null) {
+		                    	roleTypeUsedOnList = new ArrayList();
+		                        for (int iUsedOn = 0; iUsedOn < roleTypeUsedOnElementList.size(); iUsedOn++) {
+		                            Element currRoleTypeUsedOnElement = (Element) roleTypeUsedOnElementList.get(iUsedOn);
+		                            roleTypeUsedOnList.add(currRoleTypeUsedOnElement.getValue());
+		                        }
+		                    }
+		                    roleType.setUsedOn(roleTypeUsedOnList);
+		
+		                    currTaxSchema.addRoleType(roleType);
+		                }
+                    }
+                }
+            }
 			dts.addTaxonomy(currTaxSchema);
 			taxonomyNameToSchema.put(currTaxonomySchemaName, currTaxSchema);
 		}
@@ -246,54 +279,52 @@ public class DTSFactory {
 		while (importedTaxonomiesIterator.hasNext()) {
 			String currTaxonomySchemaName = (String) importedTaxonomiesIterator
 					.next();
+			//TODO: keep only filename after last '/' ?
 			Document taxonomySource = (Document) taxonomyNameToDocument
 					.get(currTaxonomySchemaName);
 			Element rootElement = taxonomySource.getRootElement();
 			Element annotationElement = rootElement.getChild("annotation",
-					Namespace.getNamespace("xsd",
-							"http://www.w3.org/2001/XMLSchema"));
+            		NamespaceConstants.XSD_NAMESPACE);
 			if (annotationElement != null) {
 				Element appInfoElement = annotationElement.getChild("appinfo",
-						Namespace.getNamespace("xsd",
-								"http://www.w3.org/2001/XMLSchema"));
+                		NamespaceConstants.XSD_NAMESPACE);
 				if (appInfoElement != null) {
 					List linkbaseRefList = appInfoElement.getChildren(
-							"linkbaseRef", Namespace.getNamespace("link",
-									"http://www.xbrl.org/2003/linkbase"));
+                            "linkbaseRef", NamespaceConstants.LINK_NAMESPACE);
 					for (int i = 0; i < linkbaseRefList.size(); i++) {
 						Element currLinkbaseRefElement = (Element) linkbaseRefList
 								.get(i);
-						if (currLinkbaseRefElement.getAttributeValue(
-								"role",
-								Namespace.getNamespace("xlink",
-										"http://www.w3.org/1999/xlink"))
+                        if (currLinkbaseRefElement.getAttributeValue("role", NamespaceConstants.XLINK_NAMESPACE)
 								.equals(role)) {
 							String linkbaseSource = currLinkbaseRefElement
-									.getAttributeValue(
-											"href",
-											Namespace
-													.getNamespace("xlink",
-															"http://www.w3.org/1999/xlink"));
+                                    .getAttributeValue("href", NamespaceConstants.XLINK_NAMESPACE);
 							logger.info("Building linkbase document "
 									+ linkbaseSource + " ... ");
+
+                            //TODO: vérifier si ok
+                            String linkbaseDocumentPath = taxonomySource.getBaseURI(); 
+                            if(linkbaseDocumentPath.contains("/")) {
+	                            linkbaseDocumentPath = linkbaseDocumentPath.substring(0, linkbaseDocumentPath.lastIndexOf("/") + 1);
+                            }
 							Document linkbaseDocument = saxBuilder
-									.build(taxPath + linkbaseSource);
+                                    .build(linkbaseDocumentPath + linkbaseSource);
+//                          Document linkbaseDocument = saxBuilder
+//                                  .build(taxPath + linkbaseSource);
+
+                           
 							/* collect extended link roles */
 							List extendedLinkRolesList = linkbaseDocument
 									.getRootElement()
 									.getChildren(
 											extendedLinkRole,
-											Namespace
-													.getNamespace("http://www.xbrl.org/2003/linkbase"));
+                                            NamespaceConstants.LINK_NAMESPACE);
 							for (int j = 0; j < extendedLinkRolesList.size(); j++) {
 								Element newExtendedLinkRoleElement = (Element) extendedLinkRolesList
 										.get(j);
 								String currExtendedLinkRole = newExtendedLinkRoleElement
 										.getAttributeValue(
 												"role",
-												Namespace
-														.getNamespace("xlink",
-																"http://www.w3.org/1999/xlink"));
+                                                NamespaceConstants.XLINK_NAMESPACE);
 								linkbase
 										.addExtendedLinkRole(currExtendedLinkRole);
 								List linkbaseElements = newExtendedLinkRoleElement
@@ -304,10 +335,7 @@ public class DTSFactory {
 									Attribute typeAttr = currLinkbaseElement
 											.getAttribute(
 													"type",
-													Namespace
-															.getNamespace(
-																	"xlink",
-																	"http://www.w3.org/1999/xlink"));
+                                                    NamespaceConstants.XLINK_NAMESPACE);
 									if (typeAttr != null
 											&& (typeAttr.getValue().equals(
 													"locator") || typeAttr
@@ -317,10 +345,7 @@ public class DTSFactory {
 										String label = currLinkbaseElement
 												.getAttributeValue(
 														"label",
-														Namespace
-																.getNamespace(
-																		"xlink",
-																		"http://www.w3.org/1999/xlink"));
+                                                        NamespaceConstants.XLINK_NAMESPACE);
 										if (label == null
 												|| label.length() == 0) {
 											/** TODO: throw exception! */
@@ -338,18 +363,12 @@ public class DTSFactory {
 													.setRole(currLinkbaseElement
 															.getAttributeValue(
 																	"role",
-																	Namespace
-																			.getNamespace(
-																					"xlink",
-																					"http://www.w3.org/1999/xlink")));
+                                                                    NamespaceConstants.XLINK_NAMESPACE));
 											newLocator
 													.setTitle(currLinkbaseElement
 															.getAttributeValue(
 																	"title",
-																	Namespace
-																			.getNamespace(
-																					"xlink",
-																					"http://www.w3.org/1999/xlink")));
+                                                                    NamespaceConstants.XLINK_NAMESPACE));
 											newLocator
 													.setId(currLinkbaseElement
 															.getAttributeValue("id"));
@@ -357,15 +376,18 @@ public class DTSFactory {
 											String conceptName = currLinkbaseElement
 													.getAttributeValue(
 															"href",
-															Namespace
-																	.getNamespace(
-																			"xlink",
-																			"http://www.w3.org/1999/xlink"));
+                                                            NamespaceConstants.XLINK_NAMESPACE);
 											if (conceptName == null) {
-												/** TODO: throw excpetion */
+												/** TODO: throw exception */
 												System.err
 														.println("Could not find concept the label refers to");
 											} else {
+                                            	  try {
+                                            		    conceptName = java.net.URLDecoder.decode(conceptName, "UTF-8");
+                                            	  } catch (Exception e) {
+                                            		    /** TODO: throw exception */
+                                            		    e.printStackTrace();
+                                            	  }
 												/*
 												 * concept name is in form
 												 * taxonomy#elementID - only
@@ -420,18 +442,12 @@ public class DTSFactory {
 													.setRole(currLinkbaseElement
 															.getAttributeValue(
 																	"role",
-																	Namespace
-																			.getNamespace(
-																					"xlink",
-																					"http://www.w3.org/1999/xlink")));
+                                                                    NamespaceConstants.XLINK_NAMESPACE));
 											newResource
 													.setTitle(currLinkbaseElement
 															.getAttributeValue(
 																	"title",
-																	Namespace
-																			.getNamespace(
-																					"xlink",
-																					"http://www.w3.org/1999/xlink")));
+                                                                    NamespaceConstants.XLINK_NAMESPACE));
 											newResource
 													.setId(currLinkbaseElement
 															.getAttributeValue("id"));
@@ -440,10 +456,7 @@ public class DTSFactory {
 													.setLang(currLinkbaseElement
 															.getAttributeValue(
 																	"lang",
-																	Namespace
-																			.getNamespace(
-																					"xml",
-																					"http://www.w3.org/XML/1998/namespace")));
+                                                                    NamespaceConstants.XML_NAMESPACE));
 											newResource
 													.setId(currLinkbaseElement
 															.getAttributeValue("id"));
@@ -472,6 +485,11 @@ public class DTSFactory {
 
 			String currTaxonomySchemaName = (String) importedTaxonomiesIterator
 					.next();
+			//TODO vérifier si split nécessaire
+            String currTaxonomySchemaNameList[] = currTaxonomySchemaName.split("/");
+            if(currTaxonomySchemaNameList.length > 0) {
+                currTaxonomySchemaName = currTaxonomySchemaNameList[currTaxonomySchemaNameList.length-1];
+            }
 
 			Document taxonomySource = (Document) taxonomyNameToDocument
 					.get(currTaxonomySchemaName);
@@ -501,8 +519,14 @@ public class DTSFactory {
 											Namespace
 													.getNamespace("xlink",
 															"http://www.w3.org/1999/xlink"));
+                            String linkbaseDocumentPath = taxonomySource.getBaseURI();
+                            if(linkbaseDocumentPath.contains("/")) {
+	                              linkbaseDocumentPath = linkbaseDocumentPath.substring(0, linkbaseDocumentPath.lastIndexOf("/") + 1);
+                            }
 							Document linkbaseDocument = saxBuilder
-									.build(taxPath + linkbaseSource);
+                            .build(linkbaseDocumentPath + linkbaseSource);
+//                            Document linkbaseDocument = saxBuilder
+//                                    .build(taxPath + linkbaseSource);
 							List extendedLinkRolesList = linkbaseDocument
 									.getRootElement()
 									.getChildren(
@@ -589,7 +613,7 @@ public class DTSFactory {
 															.getAttributeValue(
 																	"contextElement",
 																	NamespaceConstants.XBRLDT_NAMESPACE));
-											//											newArc.setAttributes(currArcElement
+											//	TODO check that :										newArc.setAttributes(currArcElement
 											//													.getAttributes());
 											if (currArcElement
 													.getAttributeValue("order") != null) {
@@ -667,11 +691,28 @@ public class DTSFactory {
 			Iterator tmpImportedTaxonomyNamesIterator = tmpImportedTaxonomyNames
 					.iterator();
 			while (tmpImportedTaxonomyNamesIterator.hasNext()) {
-				String nextTaxonomyFileName = (String) tmpImportedTaxonomyNamesIterator
-						.next();
-				collectImportedTaxonomies(new File(taxPath
-						+ nextTaxonomyFileName));
+                String nextTaxonomyFileName = (String) tmpImportedTaxonomyNamesIterator.next();
+                /*if(nextTaxonomyFileName.contains("iso4217-2003-04-23.xsd") ||
+                	nextTaxonomyFileName.contains("ref-2004-08-10.xsd") ||
+                    nextTaxonomyFileName.contains("xbrl-instance-2003-12-31.xsd") ||
+                    nextTaxonomyFileName.contains("xbrl-linkbase-2003-12-31.xsd") ||
+                	nextTaxonomyFileName.contains("xbrldt-2005.xsd") ||
+                	nextTaxonomyFileName.contains("ifrs-gp-typ-2006-08-15.xsd") ||
+                   nextTaxonomyFileName.contains("xl-2003-12-31.xsd") ||
+                    nextTaxonomyFileName.contains("xlink-2003-12-31.xsd")) {
+                		String xbrlSchemaFileName = nextTaxonomyFileName; 
+                		String xbrlSchemaFileNameList[] = nextTaxonomyFileName.split("/");
+                		if(xbrlSchemaFileNameList.length > 0) {
+                		    xbrlSchemaFileName = xbrlSchemaFileNameList[xbrlSchemaFileNameList.length-1];
 			}
+                		//collectImportedTaxonomies(new File(xbrlSchemaLocation + xbrlSchemaFileName));
+                		collectImportedTaxonomies(fileLoader.load(taxPath, xbrlSchemaFileName));
+                } else {*/
+                       collectImportedTaxonomies(new File(taxPath
+                        + nextTaxonomyFileName)
+                		/*fileLoader.load(taxPath, nextTaxonomyFileName)*/);
+                //}
+            }
 		}
 	}
 
@@ -682,8 +723,8 @@ public class DTSFactory {
 				.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema"));
 		for (int i = 0; i < children.size(); i++) {
 			Element currElement = (Element) children.get(i);
-			resultSet.add(new File(currElement
-					.getAttributeValue("schemaLocation")).getName());
+//            resultSet.add(currElement.getAttributeValue("schemaLocation"));
+            resultSet.add(new File(currElement.getAttributeValue("schemaLocation")).getName());
 		}
 		return resultSet;
 	}

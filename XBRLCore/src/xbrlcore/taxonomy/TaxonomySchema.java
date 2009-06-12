@@ -1,8 +1,10 @@
 package xbrlcore.taxonomy;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.jdom.Namespace;
@@ -24,6 +26,8 @@ public class TaxonomySchema implements Serializable {
 	private String name; /* name of the taxonomy */
 
 	private Set concepts; /* all the elements in the taxonomy */
+
+	private Map roleTypes; /* all the roleTypes in the taxonomy */
 
 	private Set importedTaxonomyNames; /*
 									    * names of the taxonomies imported by
@@ -50,6 +54,7 @@ public class TaxonomySchema implements Serializable {
 	 */
 	public TaxonomySchema(DiscoverableTaxonomySet dts) {
 		concepts = new HashSet();
+		roleTypes = new HashMap();
 		importedTaxonomyNames = new HashSet();
 		this.dts = dts;
 	}
@@ -63,6 +68,7 @@ public class TaxonomySchema implements Serializable {
 	 *             This exception is thrown if the ID is already available.
 	 */
 	public void addConcept(Concept concept) throws TaxonomyCreationException {
+		//if (getConceptByID(concept.getId()) != null) {
 		if (getConceptByName(concept.getName()) != null) {
 			throw new TaxonomyCreationException(
 					ExceptionConstants.EX_DOUBLE_ELEMENT);
@@ -70,6 +76,17 @@ public class TaxonomySchema implements Serializable {
 			concepts.add(concept);
 		}
 	}
+
+	/**
+	 * Adds a new RoleType to the taxonomy.
+	 * 
+	 * @param roleType
+	 *            New RoleType of the taxonomy.
+	 */
+	public void addRoleType(RoleType roleType) {
+			roleTypes.put(roleType.getRoleURI(), roleType);
+	}
+
 
 	/**
 	 * Returns a Concept object to a specific ID within this taxonomy schema.
@@ -138,6 +155,23 @@ public class TaxonomySchema implements Serializable {
 	 */
 	public Set getConcepts() {
 		return concepts;
+	}
+
+	/**
+
+	 * @return Returns a map of all RoleTypes of this taxonomy schema (RoleType
+	 *         objects).
+	 */
+	public Map getRoleTypes() {
+		return roleTypes;
+	}
+
+	/**
+	 * @return Returns the name of the imported taxonomies of the current
+	 *         taxonomy.
+	 */
+	public Set getImportedTaxonomyNames() {
+		return importedTaxonomyNames;
 	}
 
 	/**

@@ -43,6 +43,9 @@ public class Resource extends ExtendedLinkElement {
             return true;
         if (!(obj instanceof Resource))
             return false;
+        if (!(super.equals(obj))) {
+            return false;
+        }
 
         Resource otherResource = (Resource) obj;
 
@@ -64,7 +67,7 @@ public class Resource extends ExtendedLinkElement {
      * @return Returns a hash code for this object.
      */
     public int hashCode() {
-        int hash = 1;
+        int hash = super.hashCode();
         hash = hash * 31 + getLabel().hashCode();
         hash = hash
                 * 31

@@ -1,7 +1,7 @@
 package xbrlcore.constants;
 
 /**
- * This class contains some constants needed for excpetion messages. <br/><br/>
+ * This class contains some constants needed for exception messages. <br/><br/>
  * 
  * @author Daniel Hamm
  */

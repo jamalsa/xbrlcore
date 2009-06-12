@@ -30,6 +30,8 @@ public class Concept implements Serializable, Cloneable {
 
 	private boolean nillable;
 
+    private boolean fractionItem;
+
 	private boolean numericItem;
 
 	private String taxonomySchemaName;
@@ -49,7 +51,7 @@ public class Concept implements Serializable, Cloneable {
 		this.name = name;
 		elementAbstract = false;
 		nillable = false;
-		/** TODO: correct implementation */
+        fractionItem = false;
 		numericItem = true;
 	}
 
@@ -215,6 +217,9 @@ public class Concept implements Serializable, Cloneable {
 	 */
 	public void setSubstitutionGroup(String string) {
 		substitutionGroup = string;
+		if(substitutionGroup != null && "xbrli:tuple".contains(substitutionGroup)) {
+			numericItem = false;
+		}
 	}
 
 	/**
@@ -222,8 +227,46 @@ public class Concept implements Serializable, Cloneable {
 	 *            Type of the element.
 	 */
 	public void setType(String string) {
+    	//TODO: try to find a better method to determine type for inherited types
+    	// c.f corep concept p-mi_NumberOfOvershootingsDuringPrevious250WorkingDays from p-mi-2006-07-01.xsd
+    	//           that is p-mi:numberOfOvershootingsItemType inherited from xbrli:nonNegativeIntegerItemType
 		type = string;
-	}
+		if(type == null || type.trim().length() == 0) {
+			fractionItem = false;
+			numericItem = false;
+		} else if("xbrli:monetaryItemType/xbrli:sharesItemType/xbrli:pureItemType".contains(type)) {
+			fractionItem = false;
+			numericItem = true;
+		} else if ("dt:nonNegativeMonetaryItemType".contains(type)) {
+			fractionItem = false;
+			numericItem = true;
+		} else if("p-mi:multiplicationFactorItemType/p-mi:numberOfOvershootingsItemType".contains(type)) {
+			fractionItem = false;
+			numericItem = true;
+		} else if("xbrli:decimalItemType/xbrli:floatItemType/xbrli:doubleItemType".contains(type)) {
+			fractionItem = false;
+			numericItem = true;
+		} else if("xbrli:integerItemType/xbrli:nonPositiveIntegerItemType/xbrli:negativeIntegerItemType".contains(type)) {
+			fractionItem = false;
+			numericItem = true;
+		} else if("xbrli:longItemType/xbrli:intItemType/xbrli:shortItemType/xbrli:byteItemType".contains(type)) {
+			fractionItem = false;
+			numericItem = true;
+		} else if("xbrli:nonNegativeIntegerItemType/xbrli:unsignedLongItemType/xbrli:unsignedIntItemType".contains(type)) {
+			fractionItem = false;
+			numericItem = true;
+		} else if("xbrli:unsignedShortItemType/xbrli:unsignedByteItemType/xbrli:positiveIntegerItemType".contains(type)) {
+			fractionItem = false;
+			numericItem = true;
+		} else if("xbrli:fractionItemType".contains(type)) {
+			fractionItem = true;
+			numericItem = true;
+		} else {
+			fractionItem = false;
+			numericItem = false;
+		}
+
+    }
 
 	/**
 	 * @return Taxonomy name this element belongs to.
@@ -292,12 +335,25 @@ public class Concept implements Serializable, Cloneable {
 	}
 
 	/**
-	 * @return Returns the numericItem. Currently this method is not implemented
-	 *         and returns always "true".
+     * @return Returns the fractionItem.
+     */
+    public boolean isFractionItem() {
+    	return fractionItem;
+    }
+
+    /**
+     * @param fractionItem
+     *            The fractionItem to set.
 	 */
+    public void setFractionItem(boolean fractionItem) {
+        this.fractionItem = fractionItem;
+    }
+
+    /**
+     * @return Returns the numericItem.
+     */
 	public boolean isNumericItem() {
-		// return numericItem;
-		return true;
+    	return numericItem;
 	}
 
 	/**

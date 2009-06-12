@@ -126,6 +126,25 @@ public class DiscoverableTaxonomySet implements Serializable {
 		return returnSet;
 	}
 
+
+	/**
+	 * Returns a map of all the RoleTypes belonging to this DTS 
+	 * 
+	 * @return map with all the RoleTypes of all taxonomies belonging to this
+	 *         DTS.
+	 */
+	public Map getRoleTypes() {
+		Map returnMap = new HashMap();
+		Iterator dtsIterator = taxonomyMap.keySet().iterator();
+		while (dtsIterator.hasNext()) {
+			String currTaxonomyName = (String) dtsIterator.next();
+			TaxonomySchema tmpTaxonomy = (TaxonomySchema) taxonomyMap
+					.get(currTaxonomyName);
+			returnMap.putAll(tmpTaxonomy.getRoleTypes());
+		}
+		return returnMap;
+	}
+
 	/**
 	 * Returns a set of all Concept objects belonging to a specific substitution
 	 * group of this DTS.

@@ -1,0 +1,19 @@
+Changes since the 0.2.2 release
+===============================
+
+XML Parsing : Daniel Hamm has added a SAX parser to crawl the taxonomies. 
+              I (Sébastien Kirche) have the feeling that it is slower than the previous DOM parsing.
+              It seems that the implementation is unfinished. But if it confirmed to be slower, 
+              I may create a branch to get back to a DOM parser, to make some parallel tests.
+              
+Taxonomies : Donny Zhang has sent a consequent contribution that I have merged to the trunk. It includes :
+             - addition of the support for Tuples (needs unit tests)
+             - addition of the support for RoleType (needs still to be used from the SAX parser + needs unit tests)
+             - addition of the support of Concept with fractional items, adaptation of isNumericItem (needs unit tests)
+             - addition of the support for fraction units
+             - Some modifications in the InstanceValidator
+
+             - Prefix of namespaces in instance documents are no more starting with ns_* if we can get 
+               the actual prefixes from the namespaces declarations. If we cannot get the defined prefix, 
+               we generate it in the form ns_
+ 

@@ -31,7 +31,7 @@ public class InstanceUnitFactory {
 	/**
 	 * @param isocode : the ISO 4217 code of the currency, see <a href="http://www.iso.org/iso/support/faqs/faqs_widely_used_standards/widely_used_standards_other/currency_codes/currency_codes_list-1.htm">ISO 4217 codes</a>
 	 * @return an ISO 4217 compliant InstanceUnit
-	 * @author SŽébastien Kirche
+	 * @author Sébastien Kirche
 	 */
 	public static InstanceUnit getUnit4217(String isocode) {
 		Currency cur;

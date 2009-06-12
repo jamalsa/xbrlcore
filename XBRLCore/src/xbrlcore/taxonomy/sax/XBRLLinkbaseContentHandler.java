@@ -215,6 +215,7 @@ public class XBRLLinkbaseContentHandler implements ContentHandler {
 			extendedLinkRole = atts.getValue("http://www.w3.org/1999/xlink",
 					"role");
 			linkbase.addExtendedLinkRole(extendedLinkRole);
+			//FIXME: handle of roleRef now we have RoleType
 		} else if (localName.equals("presentationLink")
 				&& namespaceURI.equals("http://www.xbrl.org/2003/linkbase")) {
 			/* check whether we are in correct linkbase */
@@ -395,8 +396,7 @@ public class XBRLLinkbaseContentHandler implements ContentHandler {
 		String title = atts.getValue("http://www.w3.org/1999/xlink", "title");
 
 		/* a locator has to be created */
-		String conceptName = atts.getValue("http://www.w3.org/1999/xlink",
-				"href");
+		String conceptName = atts.getValue("http://www.w3.org/1999/xlink", "href");
 		Locator newLocator = new Locator(label, linkbaseSource);
 		newLocator.setTitle(title);
 		newLocator.setExtendedLinkRole(extendedLinkRole);
@@ -407,11 +407,17 @@ public class XBRLLinkbaseContentHandler implements ContentHandler {
 		if (concept != null) {
 			newLocator.setConcept(concept);
 		} else {
+			// the href does not point to a concept, but to another resource into another linkbase
+			String targetLinkbase  = conceptName.substring(0, conceptName.indexOf('#'));
+			Resource resource = new Resource(elementId, targetLinkbase);
+			newLocator.setResource(resource);
 			/* try to get an already existing resource */
 			/** TODO: Wie?? */
+			/*
 			throw new TaxonomyCreationException(
 					ExceptionConstants.EX_LINKBASE_LOCATOR_WITHOUT_REF + ": "
 							+ elementId + " in Linkbase " + linkbaseSource);
+			*/
 		}
 		linkbase.addExtendedLinkElement(newLocator);
 

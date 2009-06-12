@@ -8,6 +8,12 @@ import java.io.Serializable;
  * http://www.xbrl.org/SpecRecommendations/. <br/><br/>
  * 
  * @author Daniel Hamm
+ * 
+ * TODO: (Seki) That class need a refactoring as a Unit can be composed
+ *  - either by one or many measure elements 
+ *  - or by a divide element that is composed of a unitNumerator (one measure) 
+ *    and a unitDenominator (one measure)
+ *  See XBRL 2.1 Specification at chapter 4.8
  */
 public class InstanceUnit implements Serializable {
 
@@ -15,8 +21,8 @@ public class InstanceUnit implements Serializable {
 
 	private String id;
 
-	private String namespaceURI;
-
+	private String namespaceURI; //TODO: the namespace should be attached to the measures, 
+								 //make a class for it ?
 	private String value;
 
 	/**

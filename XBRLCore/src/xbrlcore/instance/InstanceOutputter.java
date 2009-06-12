@@ -240,7 +240,9 @@ public class InstanceOutputter {
         factElement.setAttribute(new Attribute("contextRef", fact
                 .getInstanceContext().getId()));
 
-        factElement.setText(fact.getValue().replaceAll(",", "."));
+		if(fact.getValue() != null) {
+        	factElement.setText(fact.getValue().replaceAll(",", "."));
+        }
 
         return factElement;
     }
@@ -334,7 +336,7 @@ public class InstanceOutputter {
                 .iterator();
         while (scenarioElementsIterator.hasNext()) {
             Element currElement = (Element) scenarioElementsIterator.next();
-            scenarioElement.addContent(currElement);
+            scenarioElement.addContent(currElement.cloneContent());
         }
 
         Element segmentElement = new Element("segment");
@@ -343,7 +345,7 @@ public class InstanceOutputter {
                 .iterator();
         while (segmentElementsIterator.hasNext()) {
             Element currElement = (Element) segmentElementsIterator.next();
-            scenarioElement.addContent(currElement);
+            scenarioElement.addContent(currElement.cloneContent());
         }
 
         /* now set dimensional information */

@@ -177,8 +177,9 @@ public class Arc implements Serializable, Comparable {
             Locator otherTargetLocator = (Locator) otherArc.getTargetElement();
             return sourceLocator.getConcept().equals(
                     otherSourceLocator.getConcept())
+                    && (targetLocator.getConcept() != null 
                     && targetLocator.getConcept().equals(
-                            otherTargetLocator.getConcept())
+                            otherTargetLocator.getConcept()))
                     && extendedLinkRole.equals(otherArc.getExtendedLinkRole());
         } else {
             return sourceElement.equals(otherArc.getSourceElement())

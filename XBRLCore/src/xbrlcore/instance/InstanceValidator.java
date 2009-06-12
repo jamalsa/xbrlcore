@@ -87,7 +87,8 @@ public class InstanceValidator {
             }
         }
 
-        SAXBuilder saxBuilder = new SAXBuilder(true);
+        SAXBuilder saxBuilder = new SAXBuilder(
+                "org.apache.xerces.parsers.SAXParser", true);
         saxBuilder.setFeature(
                 "http://apache.org/xml/features/validation/schema", true);
         saxBuilder
@@ -187,18 +188,21 @@ public class InstanceValidator {
                  * whether the numbers are correct
                  */
                 BigDecimal expectedResult = null;
-                BigDecimal calculatedResult = new BigDecimal(.0F);
-                try {
-                    expectedResult = new BigDecimal(new Float(fact.getValue()
-                            .replaceAll(",", ".")).floatValue());
-                } catch (NumberFormatException ex) {
-                    throw ex;
+                BigDecimal calculatedResult = null;
+                String factStringValue = fact.getValue();
+                if((factStringValue != null) && (factStringValue.trim().length() != 0)) {
+                	try {
+                	    expectedResult = new BigDecimal(factStringValue.replaceAll(",", "."));
+                	} catch (NumberFormatException ex) {
+                    	throw ex;
+                	}
                 }
                 /* calculate currentResult */
                 Set calculationRulesEntrySet = calculationRules.entrySet();
                 Iterator calculationRulesIterator = calculationRulesEntrySet
                         .iterator();
 
+                boolean isMissingFact = false;
                 while (calculationRulesIterator.hasNext()) {
                     Map.Entry currEntry = (Map.Entry) calculationRulesIterator
                             .next();
@@ -208,29 +212,40 @@ public class InstanceValidator {
 
                     /* get the value of this fact */
                     BigDecimal newValue = new BigDecimal(.0F);
-                    if (instance.getFact(tmpConcept, fact.getInstanceContext()) == null) {
-                        CalculationValidationException ex = new CalculationValidationException(
-                                "");
+                    Fact newFact = instance.getFact(tmpConcept, fact.getInstanceContext());
+                    if (newFact == null) {
+                    	isMissingFact = true;
+                    	String factContextID = fact.getInstanceContext().getId();
+                    	System.out.println("INFO!!! validateCalculation({" + currExtendedLinkRole + "}" + fact.getConcept().getId() + "[" + factContextID +"]): Missing " + tmpConcept.getId() + "[" + factContextID + "]");
+                    	continue;
+                    	/* TODO:
+                        CalculationValidationException ex = new CalculationValidationException("");
                         ex.setDts(currDTS);
                         ex.setMissingValues(true);
                         ex.setMissingConcept(tmpConcept);
                         throw ex;
+						*/
                     }
-
-                    String stringValue = instance.getFact(tmpConcept,
-                            fact.getInstanceContext()).getValue();
-                    try {
-                        newValue = new BigDecimal(new Float(stringValue)
-                                .floatValue());
-                    } catch (NumberFormatException ex) {
-                        throw ex;
-                    }
+                    String newFactStringValue = newFact.getValue();
+                    if((newFactStringValue != null) && (newFactStringValue.trim().length() != 0)) {
+                    	try {
+		                        newValue = new BigDecimal(newFactStringValue.trim().replaceAll(",", "."));
+                    	} catch (NumberFormatException ex) {
+                        	throw ex;
+                    	}
                     /* calculate newValue to calculatedResults */
+	                    if(calculatedResult == null) {
+	                    	calculatedResult = new BigDecimal(.0F);
+	                    }
                     calculatedResult = calculatedResult.add(newValue
                             .multiply(new BigDecimal(currWeight)));
                 }
+                }
                 /* now compare both results */
-                if (!expectedResult.equals(calculatedResult)) {
+                if (expectedResult != null
+                		&& calculatedResult != null
+                		&& expectedResult.compareTo(calculatedResult) != 0) {
+                	/* TODO:	
                     String msg = "The calculation result ";
                     msg += calculatedResult;
                     msg += " is not equal to the specified value ";
@@ -245,6 +260,8 @@ public class InstanceValidator {
                     ex.setCalculatedResult(calculatedResult);
                     ex.setCalculatedConceptSet(calculationRules.keySet());
                     throw ex;
+					*/
+                	System.out.println("ERROR!!! validate Calculation failed{" + currExtendedLinkRole + "}: " + fact.getConcept().getId() + "[" + fact.getInstanceContext().getId() +"] = " + expectedResult + " is NOT Equal To " + calculatedResult);
                 }
             }
         }

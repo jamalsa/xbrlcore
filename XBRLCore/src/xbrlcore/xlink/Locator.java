@@ -46,6 +46,10 @@ public class Locator extends ExtendedLinkElement {
 			return true;
 		if (!(obj instanceof Locator))
 			return false;
+		if (!(super.equals(obj))) {
+			return false;
+		}
+
 		Locator otherLocator = (Locator) obj;
 		return getLabel().equals(otherLocator.getLabel())
 				&& (getExtendedLinkRole() == null ? otherLocator
@@ -64,7 +68,7 @@ public class Locator extends ExtendedLinkElement {
 	 * @return Returns a hash code for this object.
 	 */
 	public int hashCode() {
-		int hash = 1;
+		int hash = super.hashCode();
 		hash = hash * 31 + getLabel().hashCode();
 		hash = hash
 				* 31
@@ -87,10 +91,10 @@ public class Locator extends ExtendedLinkElement {
 	}
 
 	/**
-	 * @return false
+	 * @return true if there is an associated resource to the locator
 	 */
 	public boolean isResource() {
-		return false;
+		return resource != null;
 	}
 
 	/**

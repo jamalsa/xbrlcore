@@ -29,6 +29,8 @@ public class Fact implements Serializable {
 
     private String value;
 
+    private String id;
+
     /**
      * Constructor.
      * 
@@ -164,6 +166,23 @@ public class Fact implements Serializable {
      */
     public void setValue(String value) {
         this.value = value;
+    }
+
+    /**
+     * 
+     * @return id of this fact.
+     */
+    public String getID() {
+        return id;
+    }
+
+    /**
+     * 
+     * @param id
+     *            id of this fact.
+     */
+    public void setID(String id) {
+        this.id = id;
     }
 
     /**

@@ -148,8 +148,8 @@ public class InstanceFactory {
 		/* set unit elements */
 		setUnitElements();
 
-		/* set facts */
-		setFacts();
+        /* set facts and tuples */
+        setFactsAndTuples();
 
 		return instance;
 	}
@@ -244,6 +244,20 @@ public class InstanceFactory {
 		}
 	}
 
+    public String getLocalValue(String value) {
+        if(value == null) {
+            return value;
+        }
+        return value.substring(value.indexOf(":") + 1, value.length());
+    }
+    
+    public String getValueNamespace(String value) {
+    	if(value == null) {
+    		return value;
+    	}
+    	return value.substring(0, value.indexOf(":"));
+    }
+
 	/**
 	 * Sets unit elements defined in this instance.
 	 * 
@@ -263,18 +277,29 @@ public class InstanceFactory {
 			}
 
 			InstanceUnit currUnit = new InstanceUnit(id);
+            List measureList = currUnitElement.getChildren("measure", instance.getInstanceNamespace());
+            Iterator measureListIterator = measureList.iterator();
+            while (measureListIterator.hasNext()) {
+                Element currMeasureElement = (Element) measureListIterator.next();
+                if(currUnit.getValue() == null) {
+                	currUnit.setValue(getLocalValue(currMeasureElement.getValue()));
+                } else {
+                	currUnit.setValue(getLocalValue(currUnit.getValue()) + "*" + getLocalValue(currMeasureElement.getValue()));
+                }
+            	currUnit.setNamespaceURI(instance.getNamespaceURI(getValueNamespace(currMeasureElement.getValue())));
+            }
+            Element divideElement = currUnitElement.getChild("divide", instance.getInstanceNamespace());
+            if(divideElement != null) {
+                Element unitNumeratorElement = divideElement.getChild("unitNumerator", instance.getInstanceNamespace());
+                Element unitDenominatorElement = divideElement.getChild("unitDenominator", instance.getInstanceNamespace());
 
-			/* set the value and its namespace */
-			Element measureElement = currUnitElement.getChild("measure",
-					instance.getInstanceNamespace());
-			String value = measureElement.getValue();
+                Element unitNumeratorMeasureElement = unitNumeratorElement.getChild("measure", instance.getInstanceNamespace());
+                Element unitDenominatorMeasureElement = unitDenominatorElement.getChild("measure", instance.getInstanceNamespace());
 
-			String namespacePrefix = value.substring(0, value.indexOf(":"));
-			String unitValue = value.substring(value.indexOf(":") + 1, value
-					.length());
-
-			currUnit.setNamespaceURI(instance.getNamespaceURI(namespacePrefix));
-			currUnit.setValue(unitValue);
+                currUnit.setValue(getLocalValue(unitNumeratorMeasureElement.getValue()) + "/" + getLocalValue(unitDenominatorMeasureElement.getValue()));
+            	//TODO: need some refactoring, the namespace should be attached to a measure class inside the unit
+                currUnit.setNamespaceURI("");
+            }
 
 			unitMap.put(id, currUnit);
 		}
@@ -368,12 +393,22 @@ public class InstanceFactory {
 			Element segmentElement = currContextElement.getChild("entity",
 					instance.getInstanceNamespace()).getChild("segment",
 					instance.getInstanceNamespace());
-			if (scenarioElement != null)
+            if (scenarioElement != null) {
 				scenSegElementList.add(scenSegElementList.size(),
 						scenarioElement);
-			if (segmentElement != null)
+                Iterator itr = (scenarioElement.getChildren()).iterator();
+                while(itr.hasNext()) {
+                	currContext.addScenarioElement((Element)itr.next());
+            	}
+            }
+            if (segmentElement != null) {
 				scenSegElementList.add(scenSegElementList.size(),
 						segmentElement);
+                Iterator itr = (segmentElement.getChildren()).iterator();
+                while(itr.hasNext()) {
+                	currContext.addSegmentElement((Element)itr.next());
+            	}
+            }
 
 			for (int i = 0; i < scenSegElementList.size(); i++) {
 				Element currElement = (Element) scenSegElementList.get(i);
@@ -497,7 +532,7 @@ public class InstanceFactory {
 	 * 
 	 * @throws InstanceException
 	 */
-	private void setFacts() throws InstanceException {
+    private void setFactsAndTuples() throws InstanceException {
 		List factElementList = xmlInstance.getRootElement().getChildren();
 		Iterator factElementListIterator = factElementList.iterator();
 		while (factElementListIterator.hasNext()) {
@@ -506,51 +541,91 @@ public class InstanceFactory {
 					&& !currFactElement.getName().equals("schemaRef")
 					&& !currFactElement.getName().equals("unit")) {
 
-				String factElementName = currFactElement.getName();
 				TaxonomySchema schema = instance
 						.getSchemaForURI(currFactElement.getNamespace());
-				Concept currFactXBRLElement = schema
-						.getConceptByName(factElementName);
+                Concept currFactConceptElement = schema
+                        .getConceptByName(currFactElement.getName());
 
-				if (currFactXBRLElement == null) {
-					throw new InstanceException(
-							ExceptionConstants.EX_INSTANCE_CREATION_FACT
-									+ factElementName);
+                if("xbrli:tuple".contains(currFactConceptElement.getSubstitutionGroup())) {
+                	Tuple newTuple = createTuple(currFactElement, currFactConceptElement);
+                	instance.addTuple(newTuple);
+                	continue;
+                } else if("xbrli:item".contains(currFactConceptElement.getSubstitutionGroup())) {
+                	Fact newFact= createFact(currFactElement, currFactConceptElement);
+                	instance.addFact(newFact);
+                }
+            }
+        }
 				}
 
+    private Fact createFact(Element element, Concept concept) throws InstanceException {
+        if (concept == null) {
+            throw new InstanceException(
+                    ExceptionConstants.EX_INSTANCE_CREATION_FACT + element.getName());
+        }
 				/* now it is a fact element */
-				Fact newFact = new Fact(currFactXBRLElement);
+        Fact newFact = new Fact(concept);
 
 				/* check if it refers to a valid context and unit */
-				String contextID = currFactElement
-						.getAttributeValue("contextRef");
-				String unitID = currFactElement.getAttributeValue("unitRef");
-				InstanceContext ctx = (InstanceContext) contextMap
-						.get(contextID);
-				InstanceUnit unit = (InstanceUnit) unitMap.get(unitID);
+        String contextID = element.getAttributeValue("contextRef");
+        InstanceContext ctx = (InstanceContext) contextMap.get(contextID);
 				if (ctx == null) {
 					throw new InstanceException(
-							ExceptionConstants.EX_INSTANCE_CREATION_NO_CONTEXT
-									+ factElementName);
+                    ExceptionConstants.EX_INSTANCE_CREATION_NO_CONTEXT + element.getName());
 				}
 
 				newFact.setInstanceContext(ctx);
+        if (element.getAttributeValue("id") != null) {
+            newFact.setID(element.getAttributeValue("id"));
+        }
+
+        if(concept.isNumericItem()) {
+            String unitID = element.getAttributeValue("unitRef");
+            InstanceUnit unit = (InstanceUnit) unitMap.get(unitID);
 				newFact.setInstanceUnit(unit);
 
 				/* set remaining information */
-				if (currFactElement.getAttributeValue("decimals") != null) {
-					newFact.setDecimals(currFactElement
-							.getAttributeValue("decimals"));
+            if (element.getAttributeValue("decimals") != null) {
+                newFact.setDecimals(element.getAttributeValue("decimals"));
 				}
-				if (currFactElement.getAttributeValue("precision") != null) {
-					newFact.setPrecision(currFactElement
-							.getAttributeValue("precision"));
+            if (element.getAttributeValue("precision") != null) {
+                newFact.setPrecision(element.getAttributeValue("precision"));
 				}
-				newFact.setValue(currFactElement.getValue());
+        }
+        if(element.getContentSize() == 0) {
+        	newFact.setValue(null);
+        } else {
+        	newFact.setValue(element.getValue());
+        }
+    	return newFact;
+    }
 
-				/* finally, add the fact to the instance */
-				instance.addFact(newFact);
+    private Tuple createTuple(Element element, Concept concept) throws InstanceException {
+        if (concept == null) {
+            throw new InstanceException(
+                    ExceptionConstants.EX_INSTANCE_CREATION_FACT + element.getName());
+        }
+        /* now it is a tuple element */
+        Tuple newTuple = new Tuple(concept);
+        if (element.getAttributeValue("id") != null) {
+            newTuple.setID(element.getAttributeValue("id"));
+        }
+
+        List childElementList = element.getChildren();
+        Iterator childElementListIterator = childElementList.iterator();
+        while (childElementListIterator.hasNext()) {
+            Element currElement = (Element) childElementListIterator.next();
+                TaxonomySchema schema = instance.getSchemaForURI(currElement.getNamespace());
+                Concept currConcept = schema.getConceptByName(currElement.getName());
+
+                if("xbrli:tuple".contains(currConcept.getSubstitutionGroup())) {
+                	Tuple newChildTuple = createTuple(currElement, currConcept);
+                	newTuple.getTupleSet().add(newChildTuple);
+                } else if("xbrli:item".contains(currConcept.getSubstitutionGroup())) {
+                	Fact newFact= createFact(currElement, currConcept);
+                	newTuple.getFactSet().add(newFact);
 			}
 		}
+    	return newTuple;
 	}
 }
