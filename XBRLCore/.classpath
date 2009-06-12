@@ -7,5 +7,7 @@
 	<classpathentry kind="lib" path="lib/xerces.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX"/>
 	<classpathentry kind="lib" path="lib/junit-4.4.jar"/>
+	<classpathentry kind="lib" path="lib/javancss.jar"/>
+	<classpathentry kind="lib" path="lib/ccl.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
