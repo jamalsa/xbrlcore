@@ -55,6 +55,8 @@ public class InstanceFactory {
 
 	private List schemaRefNamespaces;
 
+    private FileLoader fileLoader = new FileLoader();
+    
 	/**
 	 * Constructor, private.
 	 * 
@@ -628,4 +630,16 @@ public class InstanceFactory {
 		}
     	return newTuple;
 	}
+    
+    /*
+     * Allow to change the strategy of loading taxonomy files
+     */
+	public FileLoader getFileLoader() {
+		return fileLoader;
+	}
+
+	public void setFileLoader(FileLoader fileLoader) {
+		this.fileLoader = fileLoader;
+	}
+
 }

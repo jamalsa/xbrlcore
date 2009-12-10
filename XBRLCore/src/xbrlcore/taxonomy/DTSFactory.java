@@ -23,6 +23,8 @@ import xbrlcore.constants.GeneralConstants;
 import xbrlcore.constants.NamespaceConstants;
 import xbrlcore.exception.TaxonomyCreationException;
 import xbrlcore.exception.XBRLException;
+import xbrlcore.instance.FileLoader;
+import xbrlcore.instance.InstanceFactory;
 import xbrlcore.linkbase.CalculationLinkbase;
 import xbrlcore.linkbase.DefinitionLinkbase;
 import xbrlcore.linkbase.LabelLinkbase;
@@ -45,6 +47,8 @@ import xbrlcore.xlink.Resource;
 public class DTSFactory {
 
 	private static DTSFactory dtsFactory;
+	
+    private static FileLoader fileLoader;
 
 	private String taxPath;
 
@@ -84,6 +88,7 @@ public class DTSFactory {
 	public static synchronized DTSFactory get() {
 		if (dtsFactory == null) {
 			dtsFactory = new DTSFactory();
+			fileLoader = InstanceFactory.get().getFileLoader();
 		}
 		return dtsFactory;
 	}
@@ -110,6 +115,11 @@ public class DTSFactory {
 		logger.info("Processing discoverable taxonomy set "
 				+ taxonomyFile.getName() + " ...");
 
+		//if we use a cache system, ask the cache if our DTS has already been processed
+		//if yes return the saved object
+		dts = (DiscoverableTaxonomySet)fileLoader.cacheRequest("load", null, taxonomyFile.getName());
+		if(dts!=null) return dts;
+		
 		importedTaxonomies = new ArrayList();
 		taxPath = taxonomyFile.getAbsolutePath().substring(0,
 				taxonomyFile.getAbsolutePath().lastIndexOf(File.separator) + 1);
@@ -163,6 +173,10 @@ public class DTSFactory {
 		dts.setLabelLinkbase(labelLinkbase);
 		dts.setDefinitionLinkbase(defLinkbase);
 		dts.setCalculationLinkbase(calcLinkbase);
+		
+		//if we use a cache system, ask the cache to save the parsed DTS for future use 
+        fileLoader.cacheRequest("save", dts, taxonomyFile.getName());        
+
 		return dts;
 	}
 
@@ -708,9 +722,7 @@ public class DTSFactory {
                 		//collectImportedTaxonomies(new File(xbrlSchemaLocation + xbrlSchemaFileName));
                 		collectImportedTaxonomies(fileLoader.load(taxPath, xbrlSchemaFileName));
                 } else {*/
-                       collectImportedTaxonomies(new File(taxPath
-                        + nextTaxonomyFileName)
-                		/*fileLoader.load(taxPath, nextTaxonomyFileName)*/);
+                       collectImportedTaxonomies(fileLoader.load(taxPath, nextTaxonomyFileName));
                 //}
             }
 		}
