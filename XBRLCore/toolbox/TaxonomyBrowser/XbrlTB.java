@@ -88,8 +88,7 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 	/** 
 	* @param args the command line arguments : ENTRY POINT
 	*/ 
-	public static void main(String[] args) 
-	{ 
+	public static void main(String[] args){ 
 		PropertyConfigurator.configure("log4j.properties");		
 	    WindowUtilities.setNativeLookAndFeel();
 		XbrlTB lvEx = new XbrlTB();						
@@ -107,8 +106,7 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 	} 
 	
 	/** Creates a new instance of the class */ 
-	public XbrlTB() 
-	{ 
+	public XbrlTB(){ 
 		super("XBRL Taxonomy Browser");
 		ivFactory = DTSFactory.get(); 		
 		iiFactory = InstanceFactory.get();
@@ -132,100 +130,93 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 		}).start();
 	}
 	
-	public void valueChanged(TreeSelectionEvent event) {
-  	Object currentNode = tree.getLastSelectedPathComponent();
-  	if (currentNode == null) return ;
-  	String lvValue = currentNode.toString();
+	public void valueChanged(TreeSelectionEvent event){
+		Object currentNode = tree.getLastSelectedPathComponent();
+		if (currentNode == null) return ;
+		String lvValue = currentNode.toString();
   	  	
-    currentSelectionField.setText("Current Selection: " + lvValue);
+		currentSelectionField.setText("Current Selection: " + lvValue);
     
-    DefaultMutableTreeNode dtn = (DefaultMutableTreeNode)currentNode;
-    if (dtn.getUserObject() instanceof XbrlTbUserObject){
-    	XBRLTableModel model = (XBRLTableModel)this.table.getModel();
-    	model.setTable((XbrlTbUserObject)dtn.getUserObject());
-    }
-    
-  }	
+		DefaultMutableTreeNode dtn = (DefaultMutableTreeNode)currentNode;
+		if (dtn.getUserObject() instanceof XbrlTbUserObject){
+			XBRLTableModel model = (XBRLTableModel)this.table.getModel();
+			model.setTable((XbrlTbUserObject)dtn.getUserObject());
+		}
+	}	
 	
-	public void CreateFrame()
-	{		
-    fileChooser = new JFileChooser(System.getProperty("user.dir"));	    
-    fileChooser.addChoosableFileFilter(new TaxonomyFilter());
+	public void CreateFrame(){		
+		fileChooser = new JFileChooser(System.getProperty("user.dir"));	    
+		fileChooser.addChoosableFileFilter(new TaxonomyFilter());
 		
-    addWindowListener(new ExitListener());
-    Container content = getContentPane();
-    DefaultMutableTreeNode root = new DefaultMutableTreeNode("Empty"); // with that we will have an empty tree without default nodes colors/sports/food
-    model = new DefaultTreeModel(root);
-    tree = new JTree(model);
-    tree.addTreeSelectionListener(this);
+		addWindowListener(new ExitListener());
+		Container content = getContentPane();
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Empty"); // with that we will have an empty tree without default nodes colors/sports/food
+		model = new DefaultTreeModel(root);
+		tree = new JTree(model);
+		tree.addTreeSelectionListener(this);
     
-    XBRLTableModel tableModel =
-      new XBRLTableModel(){
-        //Describes the processing for entering values in the table model.
-        public void setValueAt(Object value, int row, int col){
-          /*if(listValue.get(row) instanceof Item) {
-            //Obtains the current XBRL instance value.
-            Item item = (Item)listValue.get(row);
-            //Updates the input value to the XBRL instance.
-            //If the value has been updated, true is returned; otherwise, false is returned.
-            if (updateNewValue(item, value)){
-              //Reports any changes in the table model.
-              fireTableCellUpdated(row, col);
-            }
-          }
-          */
-        }
-      };
-    //Listener registration. Registers listeners that receive notification if model information (cell value) has changed.
-//    tableModel.addTableModelListener(this);   //This class receives a change in the model.
-    //Table creation
-    tableModel.ParentClass = this;
-    table = new JTable(tableModel);
+		XBRLTableModel tableModel =	new XBRLTableModel(){
+				//Describes the processing for entering values in the table model.
+				public void setValueAt(Object value, int row, int col){
+					/*if(listValue.get(row) instanceof Item) {
+					//Obtains the current XBRL instance value.
+					Item item = (Item)listValue.get(row);
+					//Updates the input value to the XBRL instance.
+					//If the value has been updated, true is returned; otherwise, false is returned.
+					if (updateNewValue(item, value)){
+					//Reports any changes in the table model.
+					fireTableCellUpdated(row, col);
+					}
+					}
+					*/
+				}
+			};
+		//Listener registration. Registers listeners that receive notification if model information (cell value) has changed.
+		//tableModel.addTableModelListener(this);   //This class receives a change in the model.
+		//Table creation
+		tableModel.ParentClass = this;
+		table = new JTable(tableModel);
     
-//    this.table.setDefaultRenderer(Object.class, new XBRLTableCellRenderer());
-//    this.table.setDefaultEditor(Object.class, new XBRLTableCellEditor());
-    //Inhibits column movement.
-    table.getTableHeader().setReorderingAllowed(false);
-    table.setPreferredScrollableViewportSize( new java.awt.Dimension(800,70) );
+		//this.table.setDefaultRenderer(Object.class, new XBRLTableCellRenderer());
+		//this.table.setDefaultEditor(Object.class, new XBRLTableCellEditor());
+		//Inhibits column movement.
+		table.getTableHeader().setReorderingAllowed(false);
+		table.setPreferredScrollableViewportSize( new java.awt.Dimension(800,70) );
     
-    currentSelectionField = new JTextField("Current Selection: NONE");    
+		currentSelectionField = new JTextField("Current Selection: NONE");    
    
-    JSplitPane jpDetailPanel = new JSplitPane( JSplitPane.VERTICAL_SPLIT, 
-    											new JScrollPane(tree), 
-    											new JScrollPane(table) );
-    //jpDetailPanel.set...
-    JButton loadTaxo =  new JButton("Load Taxonomy");
-    loadTaxo.addActionListener(
-    	      new ActionListener(){
-    	        public void actionPerformed(ActionEvent e){
-    	        	ChooseTaxonomy();
-    	        }
-    	      }
-    	    );
+		JSplitPane jpDetailPanel = new JSplitPane( JSplitPane.VERTICAL_SPLIT, 
+												   new JScrollPane(tree), 
+												   new JScrollPane(table) );
+		//jpDetailPanel.set...
+		JButton loadTaxo =  new JButton("Load Taxonomy");
+		loadTaxo.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e){
+					ChooseTaxonomy();
+				}
+			});
     
-    JButton exportSelectedNode = new JButton("Export");
-    exportSelectedNode.addActionListener(
-  	      new ActionListener(){
-  	        public void actionPerformed(ActionEvent e){
-  	        	exportSelectedNode();
-  	        }
-  	      }
-  	    );
+		JButton exportSelectedNode = new JButton("Export");
+		exportSelectedNode.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e){
+					exportSelectedNode();
+				}
+			});
     
-    JLayeredPane taxoPane = new JLayeredPane(); 
-    taxoPane.setLayout( new BoxLayout( taxoPane, BoxLayout.LINE_AXIS ) );
-    taxoPane.add( new JLabel("Taxonomy : ") );
-    taxoField = new JTextField("");
-    taxoField.setEditable(false);
-    taxoPane.add( taxoField );
-    taxoPane.add( loadTaxo );    
-    taxoPane.add( exportSelectedNode );
-    content.add( taxoPane , BorderLayout.NORTH);
-    content.add(jpDetailPanel, BorderLayout.CENTER);
-    content.add(new JScrollPane(currentSelectionField), BorderLayout.SOUTH);    
-    
-    setSize(800, 600);
-    setVisible(true);		
+		JLayeredPane taxoPane = new JLayeredPane(); 
+		taxoPane.setLayout( new BoxLayout( taxoPane, BoxLayout.LINE_AXIS ) );
+		taxoPane.add( new JLabel("Taxonomy : ") );
+		taxoField = new JTextField("");
+		taxoField.setEditable(false);
+		taxoPane.add( taxoField );
+		taxoPane.add( loadTaxo );    
+		taxoPane.add( exportSelectedNode );
+		content.add( taxoPane , BorderLayout.NORTH);
+		content.add(jpDetailPanel, BorderLayout.CENTER);
+		content.add(new JScrollPane(currentSelectionField), BorderLayout.SOUTH);    
+		
+		setSize(800, 600);
+		setVisible(true);		
 	}
 	
 	private void exportSelectedNode() {		
@@ -256,17 +247,16 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 		    	outputstream.println( currentNode.toString() );
 		    }
 			
-		} catch (FileNotFoundException e) {
+		} 
+		catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	    
-	    
 	    currentSelectionField.setText( lvValue + " exported. ");
 	}
 		
-	public DefaultMutableTreeNode GetDimInfo()
-	{
+	public DefaultMutableTreeNode GetDimInfo(){
 		DefaultMutableTreeNode lvDimInfo = new DefaultMutableTreeNode("Dimension Informations");
 		DefaultMutableTreeNode lvSections= new DefaultMutableTreeNode("Sections");
 		
@@ -298,15 +288,13 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 		return lvDimInfo;
 	}
 	
-	public DefaultMutableTreeNode GetCalculationLinkbase()
-	{
+	public DefaultMutableTreeNode GetCalculationLinkbase(){
 		DefaultMutableTreeNode lvCalculationNode = new DefaultMutableTreeNode("CalculationLinkbase");
 		CalculationLinkbase lvCalculation = ivDTS.getCalculationLinkbase();
 		if (lvCalculation!=null){
 			XbrlTbUserObject.setIvCLB(lvCalculation);
 			Set<Concept> lsConcepts = ivDTS.getConcepts();
-			for( Concept bvConcept : lsConcepts )
-			{
+			for( Concept bvConcept : lsConcepts ){
 //				Map lmCalculations = lvCalculation.getCalculations(bvConcept, "http://www.xbrl.org/2003/role/link")
 //				lmCalculations.entrySet()
 				lvCalculationNode.add( new DefaultMutableTreeNode( new XbrlTbUserObject( bvConcept ) ) );
@@ -318,106 +306,100 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 	/**
 	* @param ...
 	*/	
-	public DefaultMutableTreeNode GetDefinitionLinkbase()
-	{
-			DefaultMutableTreeNode lvDefinitionNode = new DefaultMutableTreeNode("DefinitionLinkbase");			
-			if (ivDefinition != null){
-				XbrlTbUserObject.setIvDLB(ivDefinition);
-				DefaultMutableTreeNode lvHypercubeSetNode = new DefaultMutableTreeNode("HypercubeSet");
-				Set<Hypercube> lvHypercubeSet = ivDefinition.getHypercubeSet();
-				for (Hypercube bvHypercube : lvHypercubeSet) 
-				{ 
-					DefaultMutableTreeNode lvHypercubeNode = new DefaultMutableTreeNode( new XbrlTbUserObject(bvHypercube) );					
-					Set<Dimension> lvDimensionSet = bvHypercube.getDimensionSet();
-					for(Dimension bvDimension : lvDimensionSet)
-					{
-						DefaultMutableTreeNode lvDimensionNode = new DefaultMutableTreeNode( new XbrlTbUserObject(bvDimension) );
-						Set<ExtendedLinkElement> lvDomainMemberSet = bvDimension.getDomainMemberSet();
-						for(ExtendedLinkElement bvDomainMember : lvDomainMemberSet)
-						{
-							DefaultMutableTreeNode lvDomaineMemberNode = new DefaultMutableTreeNode( new XbrlTbUserObject(bvDomainMember) );
-							lvDimensionNode.add( lvDomaineMemberNode );
-						}						
-						lvHypercubeNode.add( lvDimensionNode );
-					}					
-					lvHypercubeSetNode.add( lvHypercubeNode );
-				}									
-				lvDefinitionNode.add( lvHypercubeSetNode );
-				
-				//Now, look for DimensionConceptSet...
-				DefaultMutableTreeNode lvDimensionSetNode = new DefaultMutableTreeNode("DimensionSet");
-				Set<Concept> lvDimensionSet = ivDefinition.getDimensionConceptSet();
-				for( Concept bvConcept : lvDimensionSet){
-					DefaultMutableTreeNode lvDimensionNode = new DefaultMutableTreeNode( new XbrlTbUserObject(bvConcept) );
-					Concept lvDimensionElement = ivDefinition.getDimensionElement(bvConcept);
-					lvDimensionSetNode.add( lvDimensionNode );
-					if (lvDimensionElement!=null){
-						DefaultMutableTreeNode lvDimensionElementNode = new DefaultMutableTreeNode( new XbrlTbUserObject(lvDimensionElement) );
-						lvDimensionSetNode.add( lvDimensionElementNode );
-					}					
-				}
-				lvDefinitionNode.add( lvDimensionSetNode );
-				
-				//Now ExtendedLinkRoles
-				DefaultMutableTreeNode lvExtendedLinkRolesNode = new DefaultMutableTreeNode("ExtendedLinkRoles");
-				Set<String> lvExtendedLinkRoleSet = ivDefinition.getExtendedLinkRoles();
-				for(String bvExtendedLinkRole : lvExtendedLinkRoleSet){
-					DefaultMutableTreeNode lvExtendedLinkRoleNode = new DefaultMutableTreeNode(bvExtendedLinkRole);
-					List<ExtendedLinkElement> lvExLinkElementList = ivDefinition.getExtendedLinkElementsFromBaseSet( bvExtendedLinkRole );
-					for(int i=0; i<lvExLinkElementList.size(); i++ ){
-						ExtendedLinkElement lvExLinkEle = lvExLinkElementList.get(i);
-						DefaultMutableTreeNode lvExtendedLinkElementInRoleNode = new  DefaultMutableTreeNode( new XbrlTbUserObject( lvExLinkEle ));						
-						lvExtendedLinkRoleNode.add( lvExtendedLinkElementInRoleNode );
-					}
-					// xlink:arcrole="http://xbrl.org/int/dim/arcrole/all" for contextElement="scenario"
-					List<Arc> lvArcSet = ivDefinition.getArcBaseSet( bvExtendedLinkRole );
-					for(int i=0;i<lvArcSet.size();i++){
-						DefaultMutableTreeNode lvArcNode = new DefaultMutableTreeNode( new XbrlTbUserObject( lvArcSet.get(i) ) );					
-						lvExtendedLinkRoleNode.add( lvArcNode );
-					}
-					lvExtendedLinkRolesNode.add( lvExtendedLinkRoleNode );
-					
-				}
-				lvDefinitionNode.add( lvExtendedLinkRolesNode );
-
-				//Now ExtendedLinkElements
-				DefaultMutableTreeNode lvExtendedLinkElementsNode = new DefaultMutableTreeNode("ExtendedLinkElements");
-				Set<ExtendedLinkElement> lvExtendedLinkElementSet = ivDefinition.getExtendedLinkElements();
-				for(ExtendedLinkElement bvExtendedLinkElement : lvExtendedLinkElementSet){
-					DefaultMutableTreeNode lvExtendedLinkElementNode = new DefaultMutableTreeNode(new XbrlTbUserObject(bvExtendedLinkElement) );
-					lvExtendedLinkElementsNode.add( lvExtendedLinkElementNode );
-				}
-				lvDefinitionNode.add( lvExtendedLinkElementsNode );
-				
-				//Now ArcBaseSet
-				DefaultMutableTreeNode lvArcBaseSetNode = new DefaultMutableTreeNode("ArcBaseSet");
-				List<Arc> lvArcList = ivDefinition.getArcBaseSet();
-				for(int i=0;i<lvArcList.size();i++){
-					DefaultMutableTreeNode lvArcBaseNode = new DefaultMutableTreeNode( new XbrlTbUserObject( lvArcList.get(i) ) );
-					lvArcBaseSetNode.add(lvArcBaseNode);
-				}
-				lvDefinitionNode.add( lvArcBaseSetNode );
-			}
-			else{
-				System.out.println( "Empty List of DefinitionLinkbase" );
-			}		
+	public DefaultMutableTreeNode GetDefinitionLinkbase(){
+		DefaultMutableTreeNode lvDefinitionNode = new DefaultMutableTreeNode("DefinitionLinkbase");			
+		if (ivDefinition != null){
+			XbrlTbUserObject.setIvDLB(ivDefinition);
+			DefaultMutableTreeNode lvHypercubeSetNode = new DefaultMutableTreeNode("HypercubeSet");
+			Set<Hypercube> lvHypercubeSet = ivDefinition.getHypercubeSet();
+			for (Hypercube bvHypercube : lvHypercubeSet){ 
+				DefaultMutableTreeNode lvHypercubeNode = new DefaultMutableTreeNode( new XbrlTbUserObject(bvHypercube) );					
+				Set<Dimension> lvDimensionSet = bvHypercube.getDimensionSet();
+				for(Dimension bvDimension : lvDimensionSet){
+					DefaultMutableTreeNode lvDimensionNode = new DefaultMutableTreeNode( new XbrlTbUserObject(bvDimension) );
+					Set<ExtendedLinkElement> lvDomainMemberSet = bvDimension.getDomainMemberSet();
+					for(ExtendedLinkElement bvDomainMember : lvDomainMemberSet){
+						DefaultMutableTreeNode lvDomaineMemberNode = new DefaultMutableTreeNode( new XbrlTbUserObject(bvDomainMember) );
+						lvDimensionNode.add( lvDomaineMemberNode );
+					}						
+					lvHypercubeNode.add( lvDimensionNode );
+				}					
+				lvHypercubeSetNode.add( lvHypercubeNode );
+			}									
+			lvDefinitionNode.add( lvHypercubeSetNode );
 			
-			return lvDefinitionNode;
+			//Now, look for DimensionConceptSet...
+			DefaultMutableTreeNode lvDimensionSetNode = new DefaultMutableTreeNode("DimensionSet");
+			Set<Concept> lvDimensionSet = ivDefinition.getDimensionConceptSet();
+			for( Concept bvConcept : lvDimensionSet){
+				DefaultMutableTreeNode lvDimensionNode = new DefaultMutableTreeNode( new XbrlTbUserObject(bvConcept) );
+				Concept lvDimensionElement = ivDefinition.getDimensionElement(bvConcept);
+				lvDimensionSetNode.add( lvDimensionNode );
+				if (lvDimensionElement!=null){
+					DefaultMutableTreeNode lvDimensionElementNode = new DefaultMutableTreeNode( new XbrlTbUserObject(lvDimensionElement) );
+					lvDimensionSetNode.add( lvDimensionElementNode );
+				}					
+			}
+			lvDefinitionNode.add( lvDimensionSetNode );
+				
+			//Now ExtendedLinkRoles
+			DefaultMutableTreeNode lvExtendedLinkRolesNode = new DefaultMutableTreeNode("ExtendedLinkRoles");
+			Set<String> lvExtendedLinkRoleSet = ivDefinition.getExtendedLinkRoles();
+			for(String bvExtendedLinkRole : lvExtendedLinkRoleSet){
+				DefaultMutableTreeNode lvExtendedLinkRoleNode = new DefaultMutableTreeNode(bvExtendedLinkRole);
+				List<ExtendedLinkElement> lvExLinkElementList = ivDefinition.getExtendedLinkElementsFromBaseSet( bvExtendedLinkRole );
+				for(int i=0; i<lvExLinkElementList.size(); i++ ){
+					ExtendedLinkElement lvExLinkEle = lvExLinkElementList.get(i);
+					DefaultMutableTreeNode lvExtendedLinkElementInRoleNode = new  DefaultMutableTreeNode( new XbrlTbUserObject( lvExLinkEle ));						
+					lvExtendedLinkRoleNode.add( lvExtendedLinkElementInRoleNode );
+				}
+				// xlink:arcrole="http://xbrl.org/int/dim/arcrole/all" for contextElement="scenario"
+				List<Arc> lvArcSet = ivDefinition.getArcBaseSet( bvExtendedLinkRole );
+				for(int i=0;i<lvArcSet.size();i++){
+					DefaultMutableTreeNode lvArcNode = new DefaultMutableTreeNode( new XbrlTbUserObject( lvArcSet.get(i) ) );					
+					lvExtendedLinkRoleNode.add( lvArcNode );
+				}
+				lvExtendedLinkRolesNode.add( lvExtendedLinkRoleNode );
+				
+			}
+			lvDefinitionNode.add( lvExtendedLinkRolesNode );
+
+			//Now ExtendedLinkElements
+			DefaultMutableTreeNode lvExtendedLinkElementsNode = new DefaultMutableTreeNode("ExtendedLinkElements");
+			Set<ExtendedLinkElement> lvExtendedLinkElementSet = ivDefinition.getExtendedLinkElements();
+			for(ExtendedLinkElement bvExtendedLinkElement : lvExtendedLinkElementSet){
+				DefaultMutableTreeNode lvExtendedLinkElementNode = new DefaultMutableTreeNode(new XbrlTbUserObject(bvExtendedLinkElement) );
+				lvExtendedLinkElementsNode.add( lvExtendedLinkElementNode );
+			}
+			lvDefinitionNode.add( lvExtendedLinkElementsNode );
+				
+			//Now ArcBaseSet
+			DefaultMutableTreeNode lvArcBaseSetNode = new DefaultMutableTreeNode("ArcBaseSet");
+			List<Arc> lvArcList = ivDefinition.getArcBaseSet();
+			for(int i=0;i<lvArcList.size();i++){
+				DefaultMutableTreeNode lvArcBaseNode = new DefaultMutableTreeNode( new XbrlTbUserObject( lvArcList.get(i) ) );
+				lvArcBaseSetNode.add(lvArcBaseNode);
+			}
+			lvDefinitionNode.add( lvArcBaseSetNode );
+		}
+		else{
+			System.out.println( "Empty List of DefinitionLinkbase" );
+		}		
+		
+		return lvDefinitionNode;
 	}
 		
 	/** 
 	* @param ...
 	*/ 	 		
-	public DefaultMutableTreeNode GetPresentationLinkbase()
-	{
+	public DefaultMutableTreeNode GetPresentationLinkbase(){
 		XbrlTbUserObject.setLabelLinkbase( ivLLB );
 		XbrlTbUserObject.setIvPLB( ivPresentation );
 		DefaultMutableTreeNode lvPresentationNode = new DefaultMutableTreeNode("PresentationLinkbase");
 		DefaultMutableTreeNode lvExtendedLinkRole;		
 		if (ivPresentation!=null){				
 			Set<String> lvExtendedRoles = ivPresentation.getExtendedLinkRoles();
-			for (String bvExtendedLinkRole : lvExtendedRoles) 
-			{ 
+			for (String bvExtendedLinkRole : lvExtendedRoles){ 
 				lvExtendedLinkRole = new DefaultMutableTreeNode( new XbrlTbUserObject(bvExtendedLinkRole) );
 				System.out.println( "<ExtendedLinkRoles name=\"" + bvExtendedLinkRole + "\">" );
 				EnumPresentationLinkBaseElements( ivPresentation.getPresentationLinkbaseElementRoot( bvExtendedLinkRole ), bvExtendedLinkRole, lvExtendedLinkRole, 0 );
@@ -435,42 +417,39 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 	/** 
 	* @param ...
 	*/ 	 			
-	public void EnumPresentationLinkBaseElements( List<PresentationLinkbaseElement> lvPERoots, String asExtendedLinkRole, DefaultMutableTreeNode lvExtendedLinkRole, int lvParentLevel )
-	{
-			if (lvPERoots==null) return;
+	public void EnumPresentationLinkBaseElements( List<PresentationLinkbaseElement> lvPERoots, String asExtendedLinkRole, DefaultMutableTreeNode lvExtendedLinkRole, int lvParentLevel ){
+		if (lvPERoots==null) return;
 				
-			Iterator liPERoots = lvPERoots.iterator();
-			while( liPERoots.hasNext() ){				
-				PresentationLinkbaseElement bvPElement = (PresentationLinkbaseElement) liPERoots.next();				
-				Concept lvParentElement = bvPElement.getParentElement();				
-				if (ib_debug) System.out.println( "<concept>" );
-				if (ib_debug) System.out.println( bvPElement.getConcept().getName() 														
-														+ "\t" + ivLLB.getLabel( bvPElement.getConcept() , xbrlcore.constants.GeneralConstants.XBRL_ROLE_LABEL )
-														+ (ib_debug ? ""
-														+ "\t" + bvPElement.getLevel() 
-														+ "\t" + ((lvParentElement==null)?"":lvParentElement.getName())														
-														+ "\t" + bvPElement.getConcept().getId()
-														+ "\t" + bvPElement.getNumDirectSuccessor()
-														+ "\t" + bvPElement.getNumSuccessorAtDeepestLevel()
-														+ "\t" + bvPElement.getPositionDeepestLevel()										
-														: "" )
-														);
-
-				if( bvPElement.getLevel() == lvParentLevel+1 )
-				{
-					DefaultMutableTreeNode lvConceptNode = new DefaultMutableTreeNode( new XbrlTbUserObject(bvPElement) );
-					EnumConcepts( bvPElement.getSuccessorElements(), asExtendedLinkRole, lvConceptNode, bvPElement.getLevel() );										
-					lvExtendedLinkRole.add( lvConceptNode );
-				}				
-				if (ib_debug) System.out.println( "</concept>" );				
-			}		
+		Iterator liPERoots = lvPERoots.iterator();
+		while( liPERoots.hasNext() ){				
+			PresentationLinkbaseElement bvPElement = (PresentationLinkbaseElement) liPERoots.next();				
+			Concept lvParentElement = bvPElement.getParentElement();				
+			if (ib_debug) System.out.println( "<concept>" );
+			if (ib_debug) System.out.println( bvPElement.getConcept().getName() 														
+											  + "\t" + ivLLB.getLabel( bvPElement.getConcept() , xbrlcore.constants.GeneralConstants.XBRL_ROLE_LABEL )
+											  + (ib_debug ? ""
+												 + "\t" + bvPElement.getLevel() 
+												 + "\t" + ((lvParentElement==null)?"":lvParentElement.getName())														
+												 + "\t" + bvPElement.getConcept().getId()
+												 + "\t" + bvPElement.getNumDirectSuccessor()
+												 + "\t" + bvPElement.getNumSuccessorAtDeepestLevel()
+												 + "\t" + bvPElement.getPositionDeepestLevel()										
+												 : "" )
+											  );
+			
+			if( bvPElement.getLevel() == lvParentLevel+1 ){
+				DefaultMutableTreeNode lvConceptNode = new DefaultMutableTreeNode( new XbrlTbUserObject(bvPElement) );
+				EnumConcepts( bvPElement.getSuccessorElements(), asExtendedLinkRole, lvConceptNode, bvPElement.getLevel() );										
+				lvExtendedLinkRole.add( lvConceptNode );
+			}				
+			if (ib_debug) System.out.println( "</concept>" );				
+		}		
 	}
 
 	/** 
 	* @param ...
 	*/ 	 			
-	public void EnumConcepts( List<Concept> lvConcepts, String asExtendedLinkRole, DefaultMutableTreeNode lvConceptNode, int lvParentLevel )
-	{
+	public void EnumConcepts( List<Concept> lvConcepts, String asExtendedLinkRole, DefaultMutableTreeNode lvConceptNode, int lvParentLevel ){
 		Iterator liConcepts = lvConcepts.iterator();
 		if (ib_debug) System.out.println("<EnumConcepts>");
 		while( liConcepts.hasNext() ){			
@@ -489,10 +468,8 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 	/**
 	* @param afTaxonomyFile is the root file of the taxonomy to explore...
 	*/
-	public void Extract()
-	{
-		try 
-		{ 
+	public void Extract(){
+		try{ 
 			taxoField.setText( taxoEntryPoint.getAbsolutePath() );
 			//initialize objects
 			
@@ -547,7 +524,6 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 		//root.add( GetProhibitedArc() );
 		//...
 		tree.setModel( new DefaultTreeModel(root) );   
-
 	}	
  
 } 
