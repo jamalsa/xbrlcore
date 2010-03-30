@@ -29,7 +29,6 @@ import xbrlcore.exception.InstanceException;
 import xbrlcore.exception.XBRLException;
 import xbrlcore.taxonomy.Concept;
 import xbrlcore.taxonomy.DiscoverableTaxonomySet;
-import xbrlcore.taxonomy.DTSFactory;
 import xbrlcore.taxonomy.TaxonomySchema;
 
 /**
@@ -47,13 +46,13 @@ public class InstanceFactory {
 
 	private Document xmlInstance;
 
-	private Map contextMap;
+	private Map<String, InstanceContext> contextMap;
 
-	private Map unitMap;
+	private Map<String, InstanceUnit> unitMap;
 
 	private String PATH;
 
-	private List schemaRefNamespaces;
+	private List<Namespace> schemaRefNamespaces;
 
     private FileLoader fileLoader = new FileLoader();
     
@@ -62,9 +61,9 @@ public class InstanceFactory {
 	 * 
 	 */
 	private InstanceFactory() {
-		contextMap = new HashMap();
-		unitMap = new HashMap();
-		schemaRefNamespaces = new ArrayList();
+		contextMap = new HashMap<String, InstanceContext>();
+		unitMap = new HashMap<String, InstanceUnit>();
+		schemaRefNamespaces = new ArrayList<Namespace>();
 	}
 
 	/**
@@ -100,14 +99,14 @@ public class InstanceFactory {
 		xmlInstance = builder.build(PATH + instanceFile.getName());
 
 		/* determine taxonomy names */
-		Set taxonomyNameSet = getReferencedSchemaNames(xmlInstance);
+		Set<String> taxonomyNameSet = getReferencedSchemaNames(xmlInstance);
 
 		/* now build the taxonomy */
 		xbrlcore.taxonomy.sax.SAXBuilder xbrlBuilder = new xbrlcore.taxonomy.sax.SAXBuilder();
-		Iterator taxonomyNameSetIterator = taxonomyNameSet.iterator();
-		Set dtsSet = new HashSet();
+		Iterator<String> taxonomyNameSetIterator = taxonomyNameSet.iterator();
+		Set<DiscoverableTaxonomySet> dtsSet = new HashSet<DiscoverableTaxonomySet>();
 		while (taxonomyNameSetIterator.hasNext()) {
-			String currTaxonomyName = (String) taxonomyNameSetIterator.next();
+			String currTaxonomyName = taxonomyNameSetIterator.next();
 			String path = PATH + currTaxonomyName;
 			String source = path.replaceAll("\\\\", "/");
 			DiscoverableTaxonomySet currTaxonomy = xbrlBuilder
@@ -125,7 +124,7 @@ public class InstanceFactory {
 	 * @return An object of xbrlcore.instance.Instance.
 	 * @throws InstanceException
 	 */
-	private Instance getInstance(Set dtsSet, String fileName)
+	private Instance getInstance(Set<DiscoverableTaxonomySet> dtsSet, String fileName)
 			throws InstanceException, CloneNotSupportedException {
 
 		instance = new Instance(dtsSet);
@@ -163,12 +162,12 @@ public class InstanceFactory {
 	 *            Structure of the instance file.
 	 * @return Set of names of the taxonomy the instance refers to.
 	 */
-	private Set getReferencedSchemaNames(Document currDocument) {
-		Set referencedSchemaNameSet = new HashSet();
-		List elementList = currDocument.getRootElement().getChildren();
-		Iterator elementListIterator = elementList.iterator();
+	private Set<String> getReferencedSchemaNames(Document currDocument) {
+		Set<String> referencedSchemaNameSet = new HashSet<String>();
+		List<Element> elementList = currDocument.getRootElement().getChildren();
+		Iterator<Element> elementListIterator = elementList.iterator();
 		while (elementListIterator.hasNext()) {
-			Element currElement = (Element) elementListIterator.next();
+			Element currElement = elementListIterator.next();
 			if (currElement.getName().equals("schemaRef")) {
 				referencedSchemaNameSet.add(currElement.getAttributeValue(
 						"href", NamespaceConstants.XLINK_NAMESPACE));
@@ -193,10 +192,10 @@ public class InstanceFactory {
 	 * Sets additional namespaces needed in this instance.
 	 * 
 	 */
-	private void setAdditionalNamespaces(List additionalNamespaces) {
-		Iterator additionalNamespacesIterator = additionalNamespaces.iterator();
+	private void setAdditionalNamespaces(List<Namespace> additionalNamespaces) {
+		Iterator<Namespace> additionalNamespacesIterator = additionalNamespaces.iterator();
 		while (additionalNamespacesIterator.hasNext()) {
-			Namespace currentNamespace = (Namespace) additionalNamespacesIterator
+			Namespace currentNamespace = additionalNamespacesIterator
 					.next();
 			if (instance.getNamespace(currentNamespace.getURI()) == null) {
 				instance.addNamespace(currentNamespace);
@@ -266,11 +265,11 @@ public class InstanceFactory {
 	 * @throws InstanceException
 	 */
 	private void setUnitElements() throws InstanceException {
-		List unitElementList = xmlInstance.getRootElement().getChildren("unit",
+		List<Element> unitElementList = xmlInstance.getRootElement().getChildren("unit",
 				instance.getInstanceNamespace());
-		Iterator unitElementListIterator = unitElementList.iterator();
+		Iterator<Element> unitElementListIterator = unitElementList.iterator();
 		while (unitElementListIterator.hasNext()) {
-			Element currUnitElement = (Element) unitElementListIterator.next();
+			Element currUnitElement = unitElementListIterator.next();
 			String id = currUnitElement.getAttributeValue("id");
 
 			if (id == null || id.length() == 0) {
@@ -279,10 +278,10 @@ public class InstanceFactory {
 			}
 
 			InstanceUnit currUnit = new InstanceUnit(id);
-            List measureList = currUnitElement.getChildren("measure", instance.getInstanceNamespace());
-            Iterator measureListIterator = measureList.iterator();
+            List<Element> measureList = currUnitElement.getChildren("measure", instance.getInstanceNamespace());
+            Iterator<Element> measureListIterator = measureList.iterator();
             while (measureListIterator.hasNext()) {
-                Element currMeasureElement = (Element) measureListIterator.next();
+                Element currMeasureElement = measureListIterator.next();
                 if(currUnit.getValue() == null) {
                 	currUnit.setValue(getLocalValue(currMeasureElement.getValue()));
                 } else {
@@ -313,10 +312,10 @@ public class InstanceFactory {
 	 *         Discoverable Taxonomy Sets the instance refers to.
 	 */
 	private Concept getConceptByName(String name) {
-		Set dtsSet = instance.getDiscoverableTaxonomySet();
-		Iterator dtsSetIterator = dtsSet.iterator();
+		Set<DiscoverableTaxonomySet> dtsSet = instance.getDiscoverableTaxonomySet();
+		Iterator<DiscoverableTaxonomySet> dtsSetIterator = dtsSet.iterator();
 		while (dtsSetIterator.hasNext()) {
-			DiscoverableTaxonomySet currDts = (DiscoverableTaxonomySet) dtsSetIterator
+			DiscoverableTaxonomySet currDts = dtsSetIterator
 					.next();
 			Concept currConcept = currDts.getConceptByName(name);
 			if (currConcept != null) {
@@ -333,11 +332,11 @@ public class InstanceFactory {
 	 */
 	private void setContextElements() throws InstanceException,
 			CloneNotSupportedException {
-		List contextElementList = xmlInstance.getRootElement().getChildren(
+		List<Element> contextElementList = xmlInstance.getRootElement().getChildren(
 				"context", instance.getInstanceNamespace());
-		Iterator contextElementListIterator = contextElementList.iterator();
+		Iterator<Element> contextElementListIterator = contextElementList.iterator();
 		while (contextElementListIterator.hasNext()) {
-			Element currContextElement = (Element) contextElementListIterator
+			Element currContextElement = contextElementListIterator
 					.next();
 			String id = currContextElement.getAttributeValue("id");
 
@@ -388,7 +387,7 @@ public class InstanceFactory {
 			 * set multidimensional information - parse both <scenario> and
 			 * <segment> element
 			 */
-			List scenSegElementList = new ArrayList();
+			List<Element> scenSegElementList = new ArrayList<Element>();
 			Element scenarioElement = currContextElement.getChild("scenario",
 					instance.getInstanceNamespace());
 			/* <segment> is a child element of <entity> */
@@ -398,42 +397,33 @@ public class InstanceFactory {
             if (scenarioElement != null) {
 				scenSegElementList.add(scenSegElementList.size(),
 						scenarioElement);
-                Iterator itr = (scenarioElement.getChildren()).iterator();
+                Iterator<Element> itr = (scenarioElement.getChildren()).iterator();
                 while(itr.hasNext()) {
-                	currContext.addScenarioElement((Element)itr.next());
+                	currContext.addScenarioElement(itr.next());
             	}
             }
             if (segmentElement != null) {
 				scenSegElementList.add(scenSegElementList.size(),
 						segmentElement);
-                Iterator itr = (segmentElement.getChildren()).iterator();
+                Iterator<Element> itr = (segmentElement.getChildren()).iterator();
                 while(itr.hasNext()) {
-                	currContext.addSegmentElement((Element)itr.next());
+                	currContext.addSegmentElement(itr.next());
             	}
             }
 
 			for (int i = 0; i < scenSegElementList.size(); i++) {
-				Element currElement = (Element) scenSegElementList.get(i);
-				List explicitMemberElementList = currElement
-						.getChildren(
-								"explicitMember",
-								instance
-										.getNamespace(NamespaceConstants.XBRLDI_NAMESPACE
-												.getURI()));
-				List typedMemberElementList = currElement
-						.getChildren(
-								"typedMember",
-								instance
-										.getNamespace(NamespaceConstants.XBRLDI_NAMESPACE
-												.getURI()));
-				Iterator explicitMemberElementListIterator = explicitMemberElementList
-						.iterator();
-				Iterator typedMemberElementListIterator = typedMemberElementList
-						.iterator();
+				Element currElement = scenSegElementList.get(i);
+				List<Element> explicitMemberElementList = currElement.getChildren("explicitMember",
+								instance.getNamespace(NamespaceConstants.XBRLDI_NAMESPACE.getURI()));
+				List<Element> typedMemberElementList = currElement
+						.getChildren("typedMember",
+								instance.getNamespace(NamespaceConstants.XBRLDI_NAMESPACE.getURI()));
+				Iterator<Element> explicitMemberElementListIterator = explicitMemberElementList.iterator();
+				Iterator<Element> typedMemberElementListIterator = typedMemberElementList.iterator();
 				MultipleDimensionType mdt = null;
 				/* set explicit member */
 				while (explicitMemberElementListIterator.hasNext()) {
-					Element currExplicitMemberElement = (Element) explicitMemberElementListIterator
+					Element currExplicitMemberElement = explicitMemberElementListIterator
 							.next();
 
 					/* determine dimension element */
@@ -477,7 +467,7 @@ public class InstanceFactory {
 				}
 				/* set typed member */
 				while (typedMemberElementListIterator.hasNext()) {
-					Element currTypedMemberElement = (Element) typedMemberElementListIterator
+					Element currTypedMemberElement = typedMemberElementListIterator
 							.next();
 
 					/* determine dimension element */
@@ -535,10 +525,10 @@ public class InstanceFactory {
 	 * @throws InstanceException
 	 */
     private void setFactsAndTuples() throws InstanceException {
-		List factElementList = xmlInstance.getRootElement().getChildren();
-		Iterator factElementListIterator = factElementList.iterator();
+		List<Element> factElementList = xmlInstance.getRootElement().getChildren();
+		Iterator<Element> factElementListIterator = factElementList.iterator();
 		while (factElementListIterator.hasNext()) {
-			Element currFactElement = (Element) factElementListIterator.next();
+			Element currFactElement = factElementListIterator.next();
 			if (!currFactElement.getName().equals("context")
 					&& !currFactElement.getName().equals("schemaRef")
 					&& !currFactElement.getName().equals("unit")) {
@@ -570,7 +560,7 @@ public class InstanceFactory {
 
 				/* check if it refers to a valid context and unit */
         String contextID = element.getAttributeValue("contextRef");
-        InstanceContext ctx = (InstanceContext) contextMap.get(contextID);
+        InstanceContext ctx = contextMap.get(contextID);
 				if (ctx == null) {
 					throw new InstanceException(
                     ExceptionConstants.EX_INSTANCE_CREATION_NO_CONTEXT + element.getName());
@@ -583,7 +573,7 @@ public class InstanceFactory {
 
         if(concept.isNumericItem()) {
             String unitID = element.getAttributeValue("unitRef");
-            InstanceUnit unit = (InstanceUnit) unitMap.get(unitID);
+            InstanceUnit unit = unitMap.get(unitID);
 				newFact.setInstanceUnit(unit);
 
 				/* set remaining information */
@@ -613,10 +603,10 @@ public class InstanceFactory {
             newTuple.setID(element.getAttributeValue("id"));
         }
 
-        List childElementList = element.getChildren();
-        Iterator childElementListIterator = childElementList.iterator();
+        List<Element> childElementList = element.getChildren();
+        Iterator<Element> childElementListIterator = childElementList.iterator();
         while (childElementListIterator.hasNext()) {
-            Element currElement = (Element) childElementListIterator.next();
+            Element currElement = childElementListIterator.next();
                 TaxonomySchema schema = instance.getSchemaForURI(currElement.getNamespace());
                 Concept currConcept = schema.getConceptByName(currElement.getName());
 

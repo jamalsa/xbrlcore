@@ -1,10 +1,7 @@
 package xbrlcore.xlink;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.jdom.Attribute;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -14,7 +11,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * the semantic meaning of the arc. <br/><br/>
  * @author Daniel Hamm
  */
-public class Arc implements Serializable, Comparable {
+public class Arc implements Serializable, Comparable<Object> {
 
     static final long serialVersionUID = -8032592797402796322L;
 

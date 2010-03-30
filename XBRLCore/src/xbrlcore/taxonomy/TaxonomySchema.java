@@ -25,14 +25,11 @@ public class TaxonomySchema implements Serializable {
 
 	private String name; /* name of the taxonomy */
 
-	private Set concepts; /* all the elements in the taxonomy */
+	private Set<Concept> concepts; /* all the elements in the taxonomy */
 
-	private Map roleTypes; /* all the roleTypes in the taxonomy */
+	private Map<String, RoleType> roleTypes; /* all the roleTypes in the taxonomy */
 
-	private Set importedTaxonomyNames; /*
-									    * names of the taxonomies imported by
-									    * this taxonomy
-									    */
+	private Set<String> importedTaxonomyNames; /* names of the taxonomies imported by this taxonomy */
 
 	private transient Namespace namespace;
 
@@ -53,9 +50,9 @@ public class TaxonomySchema implements Serializable {
 	 *            DTS this taxonomy schema belongs to.
 	 */
 	public TaxonomySchema(DiscoverableTaxonomySet dts) {
-		concepts = new HashSet();
-		roleTypes = new HashMap();
-		importedTaxonomyNames = new HashSet();
+		concepts = new HashSet<Concept>();
+		roleTypes = new HashMap<String, RoleType>();
+		importedTaxonomyNames = new HashSet<String>();
 		this.dts = dts;
 	}
 
@@ -97,7 +94,7 @@ public class TaxonomySchema implements Serializable {
 	 *         is not found in this taxonomy, null is returned.
 	 */
 	public Concept getConceptByID(String id) {
-		Iterator iterator = concepts.iterator();
+		Iterator<Concept> iterator = concepts.iterator();
 		while (iterator.hasNext()) {
 			Concept tmpElement = (Concept) iterator.next();
 			if (tmpElement.getId() != null && tmpElement.getId().equals(id)) {
@@ -116,7 +113,7 @@ public class TaxonomySchema implements Serializable {
 	 *         is not found in this taxonomy, null is returned.
 	 */
 	public Concept getConceptByName(String name) {
-		Iterator iterator = concepts.iterator();
+		Iterator<Concept> iterator = concepts.iterator();
 		while (iterator.hasNext()) {
 			Concept tmpElement = (Concept) iterator.next();
 			if (tmpElement.getName().equals(name)) {
@@ -134,10 +131,10 @@ public class TaxonomySchema implements Serializable {
 	 *            The substitution group all returned concepts shall belong to.
 	 * @return List of Concept objects of a certain substitution group.
 	 */
-	public Set getConceptBySubstitutionGroup(String substitutionGroup) {
-		Set resultSet = new HashSet();
+	public Set<Concept> getConceptBySubstitutionGroup(String substitutionGroup) {
+		Set<Concept> resultSet = new HashSet<Concept>();
 
-		Iterator xbrlElementIterator = concepts.iterator();
+		Iterator<Concept> xbrlElementIterator = concepts.iterator();
 		while (xbrlElementIterator.hasNext()) {
 			Concept currElement = (Concept) xbrlElementIterator.next();
 			if (currElement.getSubstitutionGroup() != null
@@ -153,7 +150,7 @@ public class TaxonomySchema implements Serializable {
 	 * @return Returns a set of all concepts of this taxonomy schema (Concept
 	 *         objects).
 	 */
-	public Set getConcepts() {
+	public Set<Concept> getConcepts() {
 		return concepts;
 	}
 
@@ -162,7 +159,7 @@ public class TaxonomySchema implements Serializable {
 	 * @return Returns a map of all RoleTypes of this taxonomy schema (RoleType
 	 *         objects).
 	 */
-	public Map getRoleTypes() {
+	public Map<String, RoleType> getRoleTypes() {
 		return roleTypes;
 	}
 
@@ -170,7 +167,7 @@ public class TaxonomySchema implements Serializable {
 	 * @return Returns the name of the imported taxonomies of the current
 	 *         taxonomy.
 	 */
-	public Set getImportedTaxonomyNames() {
+	public Set<String> getImportedTaxonomyNames() {
 		return importedTaxonomyNames;
 	}
 
@@ -234,7 +231,7 @@ public class TaxonomySchema implements Serializable {
 	 * @param importedTaxonomyNames
 	 *            The importedTaxonomyNames to set.
 	 */
-	public void setImportedTaxonomyNames(Set importedTaxonomyNames) {
+	public void setImportedTaxonomyNames(Set<String> importedTaxonomyNames) {
 		this.importedTaxonomyNames = importedTaxonomyNames;
 	}
 

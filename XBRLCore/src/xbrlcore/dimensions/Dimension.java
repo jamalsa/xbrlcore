@@ -28,7 +28,7 @@ public class Dimension implements Serializable, Cloneable {
 
     private Concept concept;
 
-    private Set domainMemberSet;
+    private Set<ExtendedLinkElement> domainMemberSet;
 
     private Element typedElement;
 
@@ -40,7 +40,7 @@ public class Dimension implements Serializable, Cloneable {
      */
     public Dimension(Concept concept) {
         this.concept = concept;
-        domainMemberSet = new HashSet();
+        domainMemberSet = new HashSet<ExtendedLinkElement>();
     }
 
     /**
@@ -61,10 +61,9 @@ public class Dimension implements Serializable, Cloneable {
      *         set to false.
      */
     public boolean containsDomainMember(Concept domainMember, boolean usable) {
-        Iterator domainMemberListIterator = domainMemberSet.iterator();
+        Iterator<ExtendedLinkElement> domainMemberListIterator = domainMemberSet.iterator();
         while (domainMemberListIterator.hasNext()) {
-            ExtendedLinkElement currXLinkElement = (ExtendedLinkElement) domainMemberListIterator
-                    .next();
+            ExtendedLinkElement currXLinkElement = domainMemberListIterator.next();
             if (currXLinkElement.isLocator()) {
                 Locator currLoc = (Locator) currXLinkElement;
                 if (currLoc.getConcept().equals(domainMember)) {
@@ -113,10 +112,10 @@ public class Dimension implements Serializable, Cloneable {
     /**
      * @return A clone of the current Dimension object.
      */
-    public Object clone() throws CloneNotSupportedException {
+    public Dimension clone() throws CloneNotSupportedException {
         Dimension d = (Dimension) super.clone();
         d.setConcept((Concept) concept.clone());
-        d.setDomainMemberSet((Set) ((HashSet) domainMemberSet).clone());
+        d.setDomainMemberSet((Set<ExtendedLinkElement>) ((HashSet<ExtendedLinkElement>) domainMemberSet).clone());
         if (typedElement != null) {
             d.setTypedElement((Element) typedElement.clone());
         }
@@ -159,7 +158,7 @@ public class Dimension implements Serializable, Cloneable {
      *            Set of domain member, these must be
      *            xbrlcore.xlink.ExtendedLinkElement objects.
      */
-    public void setDomainMemberSet(Set set) {
+    public void setDomainMemberSet(Set<ExtendedLinkElement> set) {
         domainMemberSet = set;
     }
 
@@ -167,15 +166,15 @@ public class Dimension implements Serializable, Cloneable {
      * @return Set of domain member, this is a list of
      *         xbrlcore.xlink.ExtendedLinkElement objects.
      */
-    public Set getDomainMemberSet() {
+    public Set<ExtendedLinkElement> getDomainMemberSet() {
         return domainMemberSet;
     }
 
-    public void addDomainMemberSet(Set set) {
+    public void addDomainMemberSet(Set<ExtendedLinkElement> set) {
         domainMemberSet.addAll(set);
     }
 
-    public void removeDomainMemberSet(Set set) {
+    public void removeDomainMemberSet(Set<ExtendedLinkElement> set) {
         domainMemberSet.removeAll(set);
     }
 

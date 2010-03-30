@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -72,12 +73,10 @@ public class InstanceValidator {
                     + instance.getSchemaForURI(instance.getInstanceNamespace())
                             .getName();
 
-            Set additionalNamespaceSet = instance.getAdditionalNamespaceSet();
-            Iterator additionalNamespaceIterator = additionalNamespaceSet
-                    .iterator();
+            Set<Namespace> additionalNamespaceSet = instance.getAdditionalNamespaceSet();
+            Iterator<Namespace> additionalNamespaceIterator = additionalNamespaceSet.iterator();
             while (additionalNamespaceIterator.hasNext()) {
-                Namespace currNamespace = (Namespace) additionalNamespaceIterator
-                        .next();
+                Namespace currNamespace = additionalNamespaceIterator.next();
                 TaxonomySchema currSchema = instance
                         .getSchemaForURI(currNamespace);
                 if (currSchema != null) {
@@ -126,10 +125,10 @@ public class InstanceValidator {
             throws InstanceValidationException, CalculationValidationException,
             XBRLException {
         /* get all the facts */
-        Set factSet = instance.getFactSet();
-        Iterator factSetIterator = factSet.iterator();
+        Set<Fact> factSet = instance.getFactSet();
+        Iterator<Fact> factSetIterator = factSet.iterator();
         while (factSetIterator.hasNext()) {
-            Fact currFact = (Fact) factSetIterator.next();
+            Fact currFact = factSetIterator.next();
             validateCalculation(currFact);
         }
     }
@@ -146,12 +145,12 @@ public class InstanceValidator {
             throws InstanceValidationException, CalculationValidationException,
             XBRLException {
         /* get all the taxonomies this instance refers to */
-        Set dtsSet = instance.getDiscoverableTaxonomySet();
+        Set<DiscoverableTaxonomySet> dtsSet = instance.getDiscoverableTaxonomySet();
 
         DiscoverableTaxonomySet currDTS = null;
-        Iterator dtsSetIterator = dtsSet.iterator();
+        Iterator<DiscoverableTaxonomySet> dtsSetIterator = dtsSet.iterator();
         while (dtsSetIterator.hasNext()) {
-            DiscoverableTaxonomySet tmpDTS = (DiscoverableTaxonomySet) dtsSetIterator
+            DiscoverableTaxonomySet tmpDTS = dtsSetIterator
                     .next();
             if (tmpDTS.getConceptByID(fact.getConcept().getId()) != null) {
                 currDTS = tmpDTS;
@@ -174,17 +173,17 @@ public class InstanceValidator {
          * check for every extended link role whether there are calculation
          * rules defined
          */
-        Set extendedLinkRoleSet = currDTS.getCalculationLinkbase()
+        Set<String> extendedLinkRoleSet = currDTS.getCalculationLinkbase()
                 .getExtendedLinkRoles();
-        Iterator extendedLinkRoleSetIterator = extendedLinkRoleSet.iterator();
+        Iterator<String> extendedLinkRoleSetIterator = extendedLinkRoleSet.iterator();
         while (extendedLinkRoleSetIterator.hasNext()) {
-            String currExtendedLinkRole = (String) extendedLinkRoleSetIterator
+            String currExtendedLinkRole = extendedLinkRoleSetIterator
                     .next();
-            Map calculationRules = currDTS.getCalculationLinkbase()
+            Map<Concept, Float> calculationRules = currDTS.getCalculationLinkbase()
                     .getCalculations(fact.getConcept(), currExtendedLinkRole);
             if (calculationRules.size() > 0) {
                 /*
-                 * there are calculation rules defined for this concpet, check
+                 * there are calculation rules defined for this concept, check
                  * whether the numbers are correct
                  */
                 BigDecimal expectedResult = null;
@@ -198,14 +197,13 @@ public class InstanceValidator {
                 	}
                 }
                 /* calculate currentResult */
-                Set calculationRulesEntrySet = calculationRules.entrySet();
-                Iterator calculationRulesIterator = calculationRulesEntrySet
+                Set<Entry<Concept, Float>> calculationRulesEntrySet = calculationRules.entrySet();
+                Iterator<Entry<Concept, Float>> calculationRulesIterator = calculationRulesEntrySet
                         .iterator();
 
                 boolean isMissingFact = false;
                 while (calculationRulesIterator.hasNext()) {
-                    Map.Entry currEntry = (Map.Entry) calculationRulesIterator
-                            .next();
+                    Map.Entry<Concept, Float> currEntry = calculationRulesIterator.next();
                     Concept tmpConcept = (Concept) currEntry.getKey();
                     float currWeight = ((Float) currEntry.getValue())
                             .floatValue();

@@ -166,7 +166,7 @@ public final class XBRLInstanceTest {
             assertNotNull(myMDT.getDomainMemberElement());
 
             /* creation of instance */
-            Set dtsSet = new HashSet();
+            Set<DiscoverableTaxonomySet> dtsSet = new HashSet<DiscoverableTaxonomySet>();
             dtsSet.add(opTemplateTaxonomy);
             instance = new Instance(dtsSet);
             instance.addNamespace(NamespaceConstants.ISO4217_NAMESPACE);
@@ -207,7 +207,8 @@ public final class XBRLInstanceTest {
                     .getConceptByID("t-op_BankingActivitiesDimension"),
                 opTemplateTaxonomy
                     .getConceptByID("d-ba_TotalBankingActivitiesSubjectBIA"));
-            MultipleDimensionType mdt2 = new MultipleDimensionType(
+            @SuppressWarnings("unused")
+			MultipleDimensionType mdt2 = new MultipleDimensionType(
                 opTemplateTaxonomy
                     .getConceptByID("t-op_BankingActivitiesDimension"),
                 opTemplateTaxonomy

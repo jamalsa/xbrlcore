@@ -77,7 +77,7 @@ public class CalculationLinkbaseTest {
 
             Concept primItem = taxCalcDTS.getConceptByID("p0_newItem");
             assertNotNull(primItem);
-            Map calcMap = calcLinkbase.getCalculations(primItem,
+            Map<Concept, Float> calcMap = calcLinkbase.getCalculations(primItem,
                 "http://www.xbrl.org/2003/role/link");
             assertEquals(2, calcMap.size());
         } catch (Exception ex) {
@@ -95,17 +95,17 @@ public class CalculationLinkbaseTest {
     public void singleFactToCalculate() {
         try {
             assertNotNull(instance);
-            Iterator iterator = instance.getDiscoverableTaxonomySet()
+            Iterator<DiscoverableTaxonomySet> iterator = instance.getDiscoverableTaxonomySet()
                 .iterator();
-            CalculationLinkbase calcLinkbase = ((DiscoverableTaxonomySet) iterator
-                .next()).getCalculationLinkbase();
+            @SuppressWarnings("unused")
+			CalculationLinkbase calcLinkbase = iterator.next().getCalculationLinkbase();
 
             InstanceValidator validator = new InstanceValidator(instance);
 
-            Set factSet = instance.getFactSet();
-            Iterator factSetIterator = factSet.iterator();
+            Set<Fact> factSet = instance.getFactSet();
+            Iterator<Fact> factSetIterator = factSet.iterator();
             while (factSetIterator.hasNext()) {
-                Fact currFact = (Fact) factSetIterator.next();
+                Fact currFact = factSetIterator.next();
                 if (currFact.getConcept().getId().equals("p0_newItem5")) {
                     try {
                         validator.validateCalculation(currFact);
@@ -130,9 +130,9 @@ public class CalculationLinkbaseTest {
     @Test
     public void calculateInstance() {
         assertNotNull(instance);
-        Iterator iterator = instance.getDiscoverableTaxonomySet().iterator();
-        CalculationLinkbase calcLinkbase = ((DiscoverableTaxonomySet) iterator
-            .next()).getCalculationLinkbase();
+        Iterator<DiscoverableTaxonomySet> iterator = instance.getDiscoverableTaxonomySet().iterator();
+        @SuppressWarnings("unused")
+		CalculationLinkbase calcLinkbase = iterator.next().getCalculationLinkbase();
 
         InstanceValidator validator = new InstanceValidator(instance);
         try {

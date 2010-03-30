@@ -32,7 +32,7 @@ public class PresentationLinkbaseElement implements Serializable {
 
 	private int numSuccessorAtDeepestLevel;
 
-	private List successorElements;
+	private List<Concept> successorElements;
 
 	private int positionDeepestLevel;
 
@@ -50,7 +50,7 @@ public class PresentationLinkbaseElement implements Serializable {
 		parentElement = null;
 		level = 0;
 		numSuccessorAtDeepestLevel = 0;
-		successorElements = new ArrayList();
+		successorElements = new ArrayList<Concept>();
 		positionDeepestLevel = -1;
 	}
 
@@ -86,7 +86,7 @@ public class PresentationLinkbaseElement implements Serializable {
 	/**
 	 * @return List of Concept objects of the successor elements.
 	 */
-	public List getSuccessorElements() {
+	public List<Concept> getSuccessorElements() {
 		return successorElements;
 	}
 
@@ -94,7 +94,7 @@ public class PresentationLinkbaseElement implements Serializable {
 	 * @param list
 	 *            List of Concept objects of the successor elements.
 	 */
-	public void setSuccessorElements(List list) {
+	public void setSuccessorElements(List<Concept> list) {
 		successorElements = list;
 	}
 

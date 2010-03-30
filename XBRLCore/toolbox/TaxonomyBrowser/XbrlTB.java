@@ -33,7 +33,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.jdom.JDOMException;
@@ -156,6 +155,9 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 		tree.addTreeSelectionListener(this);
     
 		XBRLTableModel tableModel =	new XBRLTableModel(){
+
+			private static final long serialVersionUID = -3084762345188824252L;
+
 				//Describes the processing for entering values in the table model.
 				public void setValueAt(Object value, int row, int col){
 					/*if(listValue.get(row) instanceof Item) {
@@ -170,7 +172,7 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 					}
 					*/
 				}
-			};
+		};
 		//Listener registration. Registers listeners that receive notification if model information (cell value) has changed.
 		//tableModel.addTableModelListener(this);   //This class receives a change in the model.
 		//Table creation
@@ -240,7 +242,7 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 			FileOutputStream output =  new FileOutputStream( fileChooser.getSelectedFile() ) ;
 			PrintStream outputstream = new PrintStream( output );
 		    if (dtn.getUserObject() instanceof XbrlTbUserObject){
-		    	XBRLTableModel model = (XBRLTableModel)this.table.getModel();
+		    	//XBRLTableModel model = (XBRLTableModel)this.table.getModel();
 		    	((XbrlTbUserObject)dtn.getUserObject()).export(outputstream);
 		    }
 		    else{
@@ -420,7 +422,7 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 	public void EnumPresentationLinkBaseElements( List<PresentationLinkbaseElement> lvPERoots, String asExtendedLinkRole, DefaultMutableTreeNode lvExtendedLinkRole, int lvParentLevel ){
 		if (lvPERoots==null) return;
 				
-		Iterator liPERoots = lvPERoots.iterator();
+		Iterator<PresentationLinkbaseElement> liPERoots = lvPERoots.iterator();
 		while( liPERoots.hasNext() ){				
 			PresentationLinkbaseElement bvPElement = (PresentationLinkbaseElement) liPERoots.next();				
 			Concept lvParentElement = bvPElement.getParentElement();				
@@ -450,7 +452,7 @@ public class XbrlTB extends JFrame implements TreeSelectionListener
 	* @param ...
 	*/ 	 			
 	public void EnumConcepts( List<Concept> lvConcepts, String asExtendedLinkRole, DefaultMutableTreeNode lvConceptNode, int lvParentLevel ){
-		Iterator liConcepts = lvConcepts.iterator();
+		Iterator<Concept> liConcepts = lvConcepts.iterator();
 		if (ib_debug) System.out.println("<EnumConcepts>");
 		while( liConcepts.hasNext() ){			
 			Concept bvConcept = (Concept) liConcepts.next();

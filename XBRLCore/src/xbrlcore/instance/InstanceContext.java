@@ -33,12 +33,12 @@ public class InstanceContext implements Serializable {
 
     private String periodEndDate;
 
-    private List scenarioElements; /*
+    private List<Element> scenarioElements; /*
                                     * List of elements within the scenario
                                     * element (besides dimensional information)
                                     */
 
-    private List segmentElements; /*
+    private List<Element> segmentElements; /*
                                    * List of elements within the segment element
                                    * (besides dimensional information
                                    */
@@ -64,8 +64,8 @@ public class InstanceContext implements Serializable {
      */
     public InstanceContext(String id) {
         this.id = id;
-        scenarioElements = new ArrayList();
-        segmentElements = new ArrayList();
+        scenarioElements = new ArrayList<Element>();
+        segmentElements = new ArrayList<Element>();
     }
 
     /**
@@ -151,7 +151,7 @@ public class InstanceContext implements Serializable {
      * @return List of org.jdom.Element objects within the <scenario>element of
      *         this context (besides dimensional information).
      */
-    public List getScenarioElements() {
+    public List<Element> getScenarioElements() {
         return scenarioElements;
     }
 
@@ -160,7 +160,7 @@ public class InstanceContext implements Serializable {
      * @return List of org.jdom.Element objects within the <segment>element of
      *         this context (besides dimensional information).
      */
-    public List getSegmentElements() {
+    public List<Element> getSegmentElements() {
         return segmentElements;
     }
 

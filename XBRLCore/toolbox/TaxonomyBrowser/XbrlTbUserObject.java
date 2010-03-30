@@ -280,7 +280,7 @@ public class XbrlTbUserObject{
 		out.println( piUserObject.getClass().getSimpleName() + "\t" + toString());
 		if(piUserObject instanceof PresentationLinkbaseElement){
 			PresentationLinkbaseElement bvPElement = (PresentationLinkbaseElement)piUserObject;
-			Iterator successors = browsePresentationLinkBaseElement(bvPElement, bvPElement.getLevel() - 1).iterator();
+			Iterator<Concept> successors = browsePresentationLinkBaseElement(bvPElement, bvPElement.getLevel() - 1).iterator();
 			while(successors.hasNext()){
 				Concept successor = (Concept)successors.next();
 				out.println( successor.getId() + "\t" + successor.getName() + "\t" + getConceptLabel(successor) );
@@ -288,7 +288,7 @@ public class XbrlTbUserObject{
 		}
 		
 		if(piUserObject instanceof Dimension){
-			Iterator idomainmembers = browseDimension( (Dimension)piUserObject ).iterator();
+			Iterator<ExtendedLinkElement> idomainmembers = browseDimension( (Dimension)piUserObject ).iterator();
 			while( idomainmembers.hasNext() ){
 				ExtendedLinkElement extLinkElement = (ExtendedLinkElement)idomainmembers.next();
 				//out.println( extLinkElement.getId() + "\t" + extLinkElement.getTitle() + "\t" + extLinkElement.getLabel() );
@@ -321,10 +321,10 @@ public class XbrlTbUserObject{
 		List<Concept> list = new LinkedList<Concept>();		
 		if( pElement.getLevel() == lvParentLevel+1 ){		
 			list.add( pElement.getConcept() );
-			Iterator successors = pElement.getSuccessorElements().iterator();
+			Iterator<Concept> successors = pElement.getSuccessorElements().iterator();
 			while(successors.hasNext()){
 				Concept successor = (Concept)successors.next();			
-				Iterator isubElements = ivPLB.getPresentationList(successor, pElement.getExtendedLinkRole() ).iterator();
+				Iterator<PresentationLinkbaseElement> isubElements = ivPLB.getPresentationList(successor, pElement.getExtendedLinkRole() ).iterator();
 				if (!isubElements.hasNext()){
 					list.add( successor ); 
 				}

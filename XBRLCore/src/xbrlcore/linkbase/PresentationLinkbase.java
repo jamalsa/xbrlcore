@@ -28,7 +28,7 @@ public class PresentationLinkbase extends Linkbase {
 	 * maps each extended link role to the corresponding
 	 * presentationLinkbaseElementList
 	 */
-	private Map linkRoleToElementList;
+	private Map<String, List<PresentationLinkbaseElement>> linkRoleToElementList;
 
 	private int positionDeepestLevel;
 
@@ -41,7 +41,7 @@ public class PresentationLinkbase extends Linkbase {
 	public PresentationLinkbase(DiscoverableTaxonomySet dts) {
 		super(dts);
 
-		linkRoleToElementList = new HashMap();
+		linkRoleToElementList = new HashMap<String, List<PresentationLinkbaseElement>>();
 	}
 
 	/**
@@ -53,19 +53,19 @@ public class PresentationLinkbase extends Linkbase {
 	public void buildPresentationLinkbase() {
 
 		/* build the presentationLinkbaseElementList for each extended link role */
-		Set extendedLinkRoles = getExtendedLinkRoles();
-		Iterator extendedLinkRolesIterator = extendedLinkRoles.iterator();
+		Set<String> extendedLinkRoles = getExtendedLinkRoles();
+		Iterator<String> extendedLinkRolesIterator = extendedLinkRoles.iterator();
 		while (extendedLinkRolesIterator.hasNext()) {
-			String currExtendedLinkRole = (String) extendedLinkRolesIterator
+			String currExtendedLinkRole = extendedLinkRolesIterator
 					.next();
-			List presentationLinkbaseElementList = new ArrayList();
+			List<PresentationLinkbaseElement> presentationLinkbaseElementList = new ArrayList<PresentationLinkbaseElement>();
 
-			List extendedLinkElementList = getExtendedLinkElementsFromBaseSet(currExtendedLinkRole);
+			List<ExtendedLinkElement> extendedLinkElementList = getExtendedLinkElementsFromBaseSet(currExtendedLinkRole);
 
-			Iterator extendedLinkElementIterator = extendedLinkElementList
+			Iterator<ExtendedLinkElement> extendedLinkElementIterator = extendedLinkElementList
 					.iterator();
 			while (extendedLinkElementIterator.hasNext()) {
-				ExtendedLinkElement currExtendedLinkElement = (ExtendedLinkElement) extendedLinkElementIterator
+				ExtendedLinkElement currExtendedLinkElement = extendedLinkElementIterator
 						.next();
 				Concept currXBRLElement = ((Locator) currExtendedLinkElement)
 						.getConcept();
@@ -76,13 +76,13 @@ public class PresentationLinkbase extends Linkbase {
 						.setExtendedLinkRole(currExtendedLinkRole);
 
 				/* set successor elements */
-				List xLinkElementsSuccessor = getTargetExtendedLinkElements(
+				List<ExtendedLinkElement> xLinkElementsSuccessor = getTargetExtendedLinkElements(
 						currXBRLElement, currExtendedLinkRole);
-				List xbrlElementSuccessor = new ArrayList();
-				Iterator xLinkElementsSuccessorIterator = xLinkElementsSuccessor
+				List<Concept> xbrlElementSuccessor = new ArrayList<Concept>();
+				Iterator<ExtendedLinkElement> xLinkElementsSuccessorIterator = xLinkElementsSuccessor
 						.iterator();
 				while (xLinkElementsSuccessorIterator.hasNext()) {
-					ExtendedLinkElement currXLinkElement = (ExtendedLinkElement) xLinkElementsSuccessorIterator
+					ExtendedLinkElement currXLinkElement = xLinkElementsSuccessorIterator
 							.next();
 					if (currXLinkElement.isLocator()) {
 						xbrlElementSuccessor.add(((Locator) currXLinkElement)
@@ -93,10 +93,10 @@ public class PresentationLinkbase extends Linkbase {
 						.setSuccessorElements(xbrlElementSuccessor);
 
 				/* set parent element (there can be only one) */
-				List xLinkList = getSourceExtendedLinkElements(currXBRLElement,
+				List<ExtendedLinkElement> xLinkList = getSourceExtendedLinkElements(currXBRLElement,
 						currExtendedLinkRole);
 				if (xLinkList.size() > 0) {
-					ExtendedLinkElement xLinkElementParent = (ExtendedLinkElement) xLinkList
+					ExtendedLinkElement xLinkElementParent = xLinkList
 							.get(0);
 					if (xLinkElementParent != null
 							&& xLinkElementParent.isLocator()) {
@@ -142,30 +142,30 @@ public class PresentationLinkbase extends Linkbase {
 	 *            obtained (if NULL, the default link role is taken).
 	 * @return List of xbrlcore.linkbase.PresentationLinkbaseElement objects.
 	 */
-	public List getPresentationList(String taxonomyName, String extendedLinkRole)
+	public List<PresentationLinkbaseElement> getPresentationList(String taxonomyName, String extendedLinkRole)
 			throws XBRLCoreException {
 		if (extendedLinkRole == null) {
 			extendedLinkRole = GeneralConstants.XBRL_LINKBASE_DEFAULT_LINKROLE;
 		}
-		List resultList = new ArrayList();
-		List finalResultList = new ArrayList();
+		List<PresentationLinkbaseElement> resultList = new ArrayList<PresentationLinkbaseElement>();
+		List<PresentationLinkbaseElement> finalResultList = new ArrayList<PresentationLinkbaseElement>();
 
 		positionDeepestLevel = 0;
 
-		List rootElementList = getPresentationLinkbaseElementRoot(extendedLinkRole);
+		List<PresentationLinkbaseElement> rootElementList = getPresentationLinkbaseElementRoot(extendedLinkRole);
 
 		for (int i = 0; i < rootElementList.size(); i++) {
-			PresentationLinkbaseElement currRootElement = (PresentationLinkbaseElement) rootElementList
+			PresentationLinkbaseElement currRootElement = rootElementList
 					.get(i);
 
-			List tmpResultList = new ArrayList();
+			List<PresentationLinkbaseElement> tmpResultList = new ArrayList<PresentationLinkbaseElement>();
 			tmpResultList = collectPresentationLinkbaseElementList(
 					currRootElement, extendedLinkRole, tmpResultList);
 			resultList.addAll(tmpResultList);
 		}
 
 		for (int i = 0; i < resultList.size(); i++) {
-			PresentationLinkbaseElement currElement = (PresentationLinkbaseElement) resultList
+			PresentationLinkbaseElement currElement = resultList
 					.get(i);
 			if ((taxonomyName != null && currElement.getConcept()
 					.getTaxonomySchemaName().equals(taxonomyName))
@@ -206,12 +206,12 @@ public class PresentationLinkbase extends Linkbase {
 	 *            Extended link role of the presentation linkbase.
 	 * @return Hierarchical presentation tree with concept being the root.
 	 */
-	public List getPresentationList(Concept concept, String extendedLinkRole) {
+	public List<PresentationLinkbaseElement> getPresentationList(Concept concept, String extendedLinkRole) {
 		if (extendedLinkRole == null) {
 			extendedLinkRole = GeneralConstants.XBRL_LINKBASE_DEFAULT_LINKROLE;
 		}
 
-		List resultList = new ArrayList();
+		List<PresentationLinkbaseElement> resultList = new ArrayList<PresentationLinkbaseElement>();
 		positionDeepestLevel = 0;
 
 		PresentationLinkbaseElement rootElement = getPresentationLinkbaseElement(
@@ -251,7 +251,7 @@ public class PresentationLinkbase extends Linkbase {
 	 *            belong to.
 	 * @return List of xbrlcore.linkbase.PresentationLinkbaseElement objects.
 	 */
-	public List getPresentationList(String taxonomyName)
+	public List<PresentationLinkbaseElement> getPresentationList(String taxonomyName)
 			throws XBRLCoreException {
 		return getPresentationList(taxonomyName,
 				GeneralConstants.XBRL_LINKBASE_DEFAULT_LINKROLE);
@@ -291,13 +291,13 @@ public class PresentationLinkbase extends Linkbase {
 		if (extendedLinkRole == null) {
 			extendedLinkRole = GeneralConstants.XBRL_LINKBASE_DEFAULT_LINKROLE;
 		}
-		List presentationLinkbaseElementList = (List) linkRoleToElementList
+		List<PresentationLinkbaseElement> presentationLinkbaseElementList = linkRoleToElementList
 				.get(extendedLinkRole);
 		if (presentationLinkbaseElementList != null) {
-			Iterator presentationLinkbaseElementListIterator = presentationLinkbaseElementList
+			Iterator<PresentationLinkbaseElement> presentationLinkbaseElementListIterator = presentationLinkbaseElementList
 					.iterator();
 			while (presentationLinkbaseElementListIterator.hasNext()) {
-				PresentationLinkbaseElement currElement = (PresentationLinkbaseElement) presentationLinkbaseElementListIterator
+				PresentationLinkbaseElement currElement = presentationLinkbaseElementListIterator
 						.next();
 				if (currElement.getConcept().getId().equals(tmpElement.getId())) {
 					return currElement;
@@ -325,9 +325,9 @@ public class PresentationLinkbase extends Linkbase {
 	/**
 	 * Helping method to build the hierarchical structure.
 	 */
-	private List collectPresentationLinkbaseElementList(
+	private List<PresentationLinkbaseElement> collectPresentationLinkbaseElementList(
 			PresentationLinkbaseElement currElement, String extendedLinkRole,
-			List currList) {
+			List<PresentationLinkbaseElement> currList) {
 		currList.add(currList.size(), currElement);
 
 		if (currElement.getNumDirectSuccessor() == 0
@@ -335,11 +335,10 @@ public class PresentationLinkbase extends Linkbase {
 			currElement.setPositionDeepestLevel(positionDeepestLevel++);
 		}
 
-		List successorElements = currElement.getSuccessorElements();
-		Iterator successorElementsIterator = successorElements.iterator();
+		List<Concept> successorElements = currElement.getSuccessorElements();
+		Iterator<Concept> successorElementsIterator = successorElements.iterator();
 		while (successorElementsIterator.hasNext()) {
-			Concept currXBRLElement = (Concept) successorElementsIterator
-					.next();
+			Concept currXBRLElement = successorElementsIterator.next();
 			PresentationLinkbaseElement nextElement = getPresentationLinkbaseElement(
 					currXBRLElement, extendedLinkRole);
 			collectPresentationLinkbaseElementList(nextElement,
@@ -355,7 +354,7 @@ public class PresentationLinkbase extends Linkbase {
 	private int determineLevel(int i, Concept currXBRLElement,
 			String extendedLinkRole) {
 		i++;
-		List xLinkList = getSourceExtendedLinkElements(currXBRLElement,
+		List<ExtendedLinkElement> xLinkList = getSourceExtendedLinkElements(currXBRLElement,
 				extendedLinkRole);
 		if (xLinkList.size() > 0) {
 			ExtendedLinkElement xLinkElementParent = (ExtendedLinkElement) xLinkList
@@ -374,7 +373,7 @@ public class PresentationLinkbase extends Linkbase {
 	 */
 	private int determineNumberOfSuccessorAtDeepestLevel(int i,
 			Concept currXBRLElement, String extendedLinkRole) {
-		List currXLinkElement = getTargetExtendedLinkElements(currXBRLElement,
+		List<ExtendedLinkElement> currXLinkElement = getTargetExtendedLinkElements(currXBRLElement,
 				extendedLinkRole);
 		/*
 		 * if element is not the source of any other element, it is at the
@@ -383,7 +382,7 @@ public class PresentationLinkbase extends Linkbase {
 		if (currXLinkElement.size() == 0) {
 			i++;
 		} else {
-			Iterator currXLinkElementIterator = currXLinkElement.iterator();
+			Iterator<ExtendedLinkElement> currXLinkElementIterator = currXLinkElement.iterator();
 			while (currXLinkElementIterator.hasNext()) {
 				ExtendedLinkElement xLinkElementChild = (ExtendedLinkElement) currXLinkElementIterator
 						.next();
@@ -406,16 +405,16 @@ public class PresentationLinkbase extends Linkbase {
 	 *         presentation linkbase (that means, which have no parent element)
 	 *         in a specific extended link role.
 	 */
-	public List getPresentationLinkbaseElementRoot(String extendedLinkRole) {
+	public List<PresentationLinkbaseElement> getPresentationLinkbaseElementRoot(String extendedLinkRole) {
 
-		List resultList = new ArrayList();
+		List<PresentationLinkbaseElement> resultList = new ArrayList<PresentationLinkbaseElement>();
 		if (extendedLinkRole == null) {
 			extendedLinkRole = GeneralConstants.XBRL_LINKBASE_DEFAULT_LINKROLE;
 		}
-		List presentationLinkbaseElementList = (List) linkRoleToElementList
+		List<PresentationLinkbaseElement> presentationLinkbaseElementList = linkRoleToElementList
 				.get(extendedLinkRole);
 		if (presentationLinkbaseElementList != null) {
-			Iterator presentationLinkbaseElementListIterator = presentationLinkbaseElementList
+			Iterator<PresentationLinkbaseElement> presentationLinkbaseElementListIterator = presentationLinkbaseElementList
 					.iterator();
 			while (presentationLinkbaseElementListIterator.hasNext()) {
 				PresentationLinkbaseElement currElement = (PresentationLinkbaseElement) presentationLinkbaseElementListIterator

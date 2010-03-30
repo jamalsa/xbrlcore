@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import xbrlcore.constants.ExceptionConstants;
 import xbrlcore.constants.GeneralConstants;
@@ -17,6 +18,7 @@ import xbrlcore.exception.TaxonomyCreationException;
 import xbrlcore.exception.XBRLException;
 import xbrlcore.taxonomy.Concept;
 import xbrlcore.taxonomy.DiscoverableTaxonomySet;
+import xbrlcore.taxonomy.TaxonomySchema;
 import xbrlcore.xlink.Arc;
 import xbrlcore.xlink.ExtendedLinkElement;
 import xbrlcore.xlink.Locator;
@@ -36,9 +38,9 @@ public class DefinitionLinkbase extends Linkbase {
 
     static final long serialVersionUID = 3859185244715363584L;
 
-    Set hypercubeSet; /* set of Hypercube objects */
+    Set<Hypercube> hypercubeSet; /* set of Hypercube objects */
 
-    Set dimensionConceptSet; /* set of Concept objects */
+    Set<Concept> dimensionConceptSet; /* set of Concept objects */
 
     /**
      * 
@@ -47,8 +49,8 @@ public class DefinitionLinkbase extends Linkbase {
      */
     public DefinitionLinkbase(DiscoverableTaxonomySet dts) {
         super(dts);
-        hypercubeSet = new HashSet();
-        dimensionConceptSet = new HashSet();
+        hypercubeSet = new HashSet<Hypercube>();
+        dimensionConceptSet = new HashSet<Concept>();
     }
 
     /**
@@ -64,38 +66,38 @@ public class DefinitionLinkbase extends Linkbase {
     public void buildDefinitionLinkbase() throws TaxonomyCreationException,
             XBRLException {
         /* first select all dimensional items */
-        Set dimensionConcepts = getDts().getConceptBySubstitutionGroup(
+        Set<Concept> dimensionConcepts = getDts().getConceptBySubstitutionGroup(
                 GeneralConstants.XBRL_SUBST_GROUP_DIMENSION_ITEM);
-        Iterator dimensionConceptsIterator = dimensionConcepts.iterator();
+        Iterator<Concept> dimensionConceptsIterator = dimensionConcepts.iterator();
         while (dimensionConceptsIterator.hasNext()) {
-            Concept dimensionElement = (Concept) dimensionConceptsIterator
+            Concept dimensionElement = dimensionConceptsIterator
                     .next();
             dimensionConceptSet.add(dimensionElement);
         }
 
         /* now select all the hypercube items */
-        Set hypercubeConcepts = getDts().getConceptBySubstitutionGroup(
+        Set<Concept> hypercubeConcepts = getDts().getConceptBySubstitutionGroup(
                 GeneralConstants.XBRL_SUBST_GROUP_HYPERCUBE_ITEM);
-        Iterator hypercubeConceptsIterator = hypercubeConcepts.iterator();
+        Iterator<Concept> hypercubeConceptsIterator = hypercubeConcepts.iterator();
         while (hypercubeConceptsIterator.hasNext()) {
-            Concept hypercubeConcept = (Concept) hypercubeConceptsIterator
+            Concept hypercubeConcept = hypercubeConceptsIterator
                     .next();
             hypercubeSet.add(new Hypercube(hypercubeConcept));
         }
 
         Hypercube currHypercube = null;
         /* go through all the extended link roles and collect the hypercubes */
-        Set extendedLinkRoles = getExtendedLinkRoles();
-        Iterator extendedLinkRolesIterator = extendedLinkRoles.iterator();
+        Set<String> extendedLinkRoles = getExtendedLinkRoles();
+        Iterator<String> extendedLinkRolesIterator = extendedLinkRoles.iterator();
         while (extendedLinkRolesIterator.hasNext()) {
-            String currExtendedLinkRole = (String) extendedLinkRolesIterator
+            String currExtendedLinkRole = extendedLinkRolesIterator
                     .next();
-            List hasHypercubeArcs = getArcBaseSet(
+            List<Arc> hasHypercubeArcs = getArcBaseSet(
                     GeneralConstants.XBRL_ARCROLE_HYPERCUBE_DIMENSION,
                     currExtendedLinkRole);
-            Iterator hasHypercubeArcsIterator = hasHypercubeArcs.iterator();
+            Iterator<Arc> hasHypercubeArcsIterator = hasHypercubeArcs.iterator();
             while (hasHypercubeArcsIterator.hasNext()) {
-                Arc currArc = (Arc) hasHypercubeArcsIterator.next();
+                Arc currArc = hasHypercubeArcsIterator.next();
                 /* from is the hypercube, to is the dimension */
                 /* check if it's still the same hypercube element */
                 Concept currHypercubeConcept = ((Locator) currArc
@@ -128,7 +130,7 @@ public class DefinitionLinkbase extends Linkbase {
                      * this is the complete sublist below the current dimension
                      * element
                      */
-                    Set domainMemberXLinkSet = null;
+                    Set<ExtendedLinkElement> domainMemberXLinkSet = null;
                     /*
                      * the link role depends on the xbrldt:targetRole of the
                      * currXArc
@@ -179,9 +181,9 @@ public class DefinitionLinkbase extends Linkbase {
      * @return The hypercube which is represented by the given Concept object.
      */
     public Hypercube getHypercube(Concept concept) {
-        Iterator hypercubeListIterator = hypercubeSet.iterator();
+        Iterator<Hypercube> hypercubeListIterator = hypercubeSet.iterator();
         while (hypercubeListIterator.hasNext()) {
-            Hypercube currHypercubeElement = (Hypercube) hypercubeListIterator
+            Hypercube currHypercubeElement = hypercubeListIterator
                     .next();
             if (currHypercubeElement.getConcept().equals(concept)) {
                 return currHypercubeElement;
@@ -212,24 +214,22 @@ public class DefinitionLinkbase extends Linkbase {
             String contextElement) throws CloneNotSupportedException,
             XBRLException {
         /* now check every extended link role */
-        List targetRoleList = new ArrayList();
+        List<String> targetRoleList = new ArrayList<String>();
         targetRoleList.add(0, GeneralConstants.XBRL_ARCROLE_HYPERCUBE_ALL);
         targetRoleList.add(1, GeneralConstants.XBRL_ARCROLE_HYPERCUBE_NOTALL);
-        Iterator extendedLinkRoleIterator = getExtendedLinkRoles().iterator();
+        Iterator<String> extendedLinkRoleIterator = getExtendedLinkRoles().iterator();
 
         nextExtendedLinkRole: while (extendedLinkRoleIterator.hasNext()) {
-            String currentExtendedLinkRole = (String) extendedLinkRoleIterator
-                    .next();
+            String currentExtendedLinkRole = extendedLinkRoleIterator.next();
 
             /* get all ..all and ..notAll links in the current link role */
-            List arcList = getArcBaseSet(targetRoleList,
-                    currentExtendedLinkRole);
-            Iterator arcListIterator = arcList.iterator();
+            List<Arc> arcList = getArcBaseSet(targetRoleList, currentExtendedLinkRole);
+            Iterator<Arc> arcListIterator = arcList.iterator();
 
-            Map hyperCubeMap = new HashMap();
+            Map<Hypercube, String> hyperCubeMap = new HashMap<Hypercube, String>();
 
             while (arcListIterator.hasNext()) {
-                Arc currentArc = (Arc) arcListIterator.next();
+                Arc currentArc = arcListIterator.next();
 
                 if (!currentArc.getContextElement().equals(contextElement))
                     continue;
@@ -242,14 +242,13 @@ public class DefinitionLinkbase extends Linkbase {
                 if (((Locator) fromElement).getConcept().equals(primaryConcept)) {
                     primaryItemInDomainMember = true;
                 } else {
-                    Set domainMemberNetwork = buildTargetNetwork(
+                    Set<ExtendedLinkElement> domainMemberNetwork = buildTargetNetwork(
                             ((Locator) fromElement).getConcept(),
                             "http://xbrl.org/int/dim/arcrole/domain-member",
                             currentExtendedLinkRole);
-                    Iterator domainMemberNetworkIterator = domainMemberNetwork
-                            .iterator();
+                    Iterator<ExtendedLinkElement> domainMemberNetworkIterator = domainMemberNetwork.iterator();
                     while (domainMemberNetworkIterator.hasNext()) {
-                        ExtendedLinkElement currentDomainMember = (ExtendedLinkElement) domainMemberNetworkIterator
+                        ExtendedLinkElement currentDomainMember = domainMemberNetworkIterator
                                 .next();
                         if (currentDomainMember.isLocator()
                                 && ((Locator) currentDomainMember).getConcept()
@@ -269,10 +268,10 @@ public class DefinitionLinkbase extends Linkbase {
 
             Hypercube relevantHypercube = new Hypercube(null);
 
-            Set hyperCubeEntrySet = hyperCubeMap.entrySet();
-            Iterator hyperCubeIterator = hyperCubeEntrySet.iterator();
+            Set<Entry<Hypercube, String>> hyperCubeEntrySet = hyperCubeMap.entrySet();
+            Iterator<Entry<Hypercube, String>> hyperCubeIterator = hyperCubeEntrySet.iterator();
             while (hyperCubeIterator.hasNext()) {
-                Map.Entry currEntry = (Map.Entry) hyperCubeIterator.next();
+                Map.Entry<Hypercube, String> currEntry = hyperCubeIterator.next();
                 Hypercube currCube = (Hypercube) currEntry.getKey();
                 String currArcrole = (String) currEntry.getValue();
                 if (currCube.getConcept().getId().equals(
@@ -317,7 +316,7 @@ public class DefinitionLinkbase extends Linkbase {
      * @return A set with TaxonomySchema objects of which the dimension
      *         represented by dimensionElement is comprised.
      */
-    public Set getDimensionTaxonomy(Concept dimensionElement) {
+    public Set<TaxonomySchema> getDimensionTaxonomy(Concept dimensionElement) {
         /*
          * Now the dimension has to be determined. This can be done by searching
          * *any* extended link role of the definition linkbase. dimensionElement
@@ -330,18 +329,18 @@ public class DefinitionLinkbase extends Linkbase {
             return null;
         }
 
-        Set resultSet = new HashSet();
+        Set<TaxonomySchema> resultSet = new HashSet<TaxonomySchema>();
 
-        Iterator extendedLinkRoleIterator = getExtendedLinkRoles().iterator();
+        Iterator<String> extendedLinkRoleIterator = getExtendedLinkRoles().iterator();
         while (extendedLinkRoleIterator.hasNext()) {
-            String currExtendedLinkRole = (String) extendedLinkRoleIterator
+            String currExtendedLinkRole = extendedLinkRoleIterator
                     .next();
-            List xArcList = getArcBaseSet(
+            List<Arc> xArcList = getArcBaseSet(
                     GeneralConstants.XBRL_ARCROLE_DIMENSION_DOMAIN,
                     currExtendedLinkRole);
-            Iterator xArcListIterator = xArcList.iterator();
+            Iterator<Arc> xArcListIterator = xArcList.iterator();
             while (xArcListIterator.hasNext()) {
-                Arc currXArc = (Arc) xArcListIterator.next();
+                Arc currXArc = xArcListIterator.next();
                 if (currXArc.getSourceElement().isLocator()
                         && currXArc.getTargetElement().isLocator()) {
                     Concept sourceConcept = ((Locator) currXArc
@@ -372,11 +371,11 @@ public class DefinitionLinkbase extends Linkbase {
     public Concept getDimensionElement(Concept domainElement) {
         if (domainElement == null)
             return null;
-        Iterator hypercubeIterator = hypercubeSet.iterator();
+        Iterator<Hypercube> hypercubeIterator = hypercubeSet.iterator();
         while (hypercubeIterator.hasNext()) {
-            Hypercube currHypercube = (Hypercube) hypercubeIterator.next();
-            Set dimensions = currHypercube.getDimensionSet();
-            Iterator dimensionsIterator = dimensions.iterator();
+            Hypercube currHypercube = hypercubeIterator.next();
+            Set<Dimension> dimensions = currHypercube.getDimensionSet();
+            Iterator<Dimension> dimensionsIterator = dimensions.iterator();
             while (dimensionsIterator.hasNext()) {
                 Dimension currDimension = (Dimension) dimensionsIterator.next();
                 if (!currDimension.isTyped()
@@ -403,22 +402,22 @@ public class DefinitionLinkbase extends Linkbase {
      */
     public boolean isUsableDomainMemberOfDimension(Concept dimensionConcept,
             Concept domainMemberConcept) {
-        Set hypercubeSet = getHypercubeSet();
-        Iterator hypercubeIterator = hypercubeSet.iterator();
+        Set<Hypercube> hypercubeSet = getHypercubeSet();
+        Iterator<Hypercube> hypercubeIterator = hypercubeSet.iterator();
         while (hypercubeIterator.hasNext()) {
-            Hypercube currHypercube = (Hypercube) hypercubeIterator.next();
+            Hypercube currHypercube = hypercubeIterator.next();
             if (currHypercube.containsUsableDimensionDomain(dimensionConcept,
                     domainMemberConcept)) {
                 /*
                  * currHypercube must be an ALL-Hypercube within any extended
                  * link role
                  */
-                Iterator extendedLinkRoleIterator = getExtendedLinkRoles()
+                Iterator<String> extendedLinkRoleIterator = getExtendedLinkRoles()
                         .iterator();
                 while (extendedLinkRoleIterator.hasNext()) {
                     String currExtendedLinkRole = (String) extendedLinkRoleIterator
                             .next();
-                    List arcBaseSet = getArcBaseSet(
+                    List<Arc> arcBaseSet = getArcBaseSet(
                             GeneralConstants.XBRL_ARCROLE_HYPERCUBE_ALL,
                             currExtendedLinkRole);
                     for (int j = 0; j < arcBaseSet.size(); j++) {
@@ -443,11 +442,11 @@ public class DefinitionLinkbase extends Linkbase {
      *         linkbase which contain at least one typed dimension. The Set
      *         contains Hypercube objects.
      */
-    public Set getTypedDimensionHypercubeSet() {
-        Set typedDimHypercubeSet = new HashSet();
-        Iterator hypercubeSetIterator = hypercubeSet.iterator();
+    public Set<Hypercube> getTypedDimensionHypercubeSet() {
+        Set<Hypercube> typedDimHypercubeSet = new HashSet<Hypercube>();
+        Iterator<Hypercube> hypercubeSetIterator = hypercubeSet.iterator();
         while (hypercubeSetIterator.hasNext()) {
-            Hypercube currHypercube = (Hypercube) hypercubeSetIterator.next();
+            Hypercube currHypercube = hypercubeSetIterator.next();
             if (currHypercube.containsTypedDimension()) {
                 typedDimHypercubeSet.add(currHypercube);
             }
@@ -460,7 +459,7 @@ public class DefinitionLinkbase extends Linkbase {
      *         xbrldt:dimensionItem) of this definition linkbase. The set
      *         contains Concept objects.
      */
-    public Set getDimensionConceptSet() {
+    public Set<Concept> getDimensionConceptSet() {
         return dimensionConceptSet;
     }
 
@@ -469,7 +468,7 @@ public class DefinitionLinkbase extends Linkbase {
      *         substitution group xbrldt:hypercubeItem) of this definition
      *         linkbase. The Set contains Hypercube objects.
      */
-    public Set getHypercubeSet() {
+    public Set<Hypercube> getHypercubeSet() {
         return hypercubeSet;
     }
 }

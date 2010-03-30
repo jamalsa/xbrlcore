@@ -65,7 +65,7 @@ public final class DefinitionLinkbaseTest {
     public void hypercube() {
         assertNotNull(definitionLinkbase);
 
-        Set hypercubeSet = definitionLinkbase.getHypercubeSet();
+        Set<Hypercube> hypercubeSet = definitionLinkbase.getHypercubeSet();
         assertEquals(3, hypercubeSet.size());
 
         Hypercube hcEuropa = stTaxonomy.getHypercube(stTaxonomy
@@ -79,17 +79,17 @@ public final class DefinitionLinkbaseTest {
         assertNotNull(hcAsien);
         assertNotNull(hcAmerika);
 
-        Set hcEuropaDimensions = hcEuropa.getDimensionSet();
+        Set<Dimension> hcEuropaDimensions = hcEuropa.getDimensionSet();
         assertEquals(2, hcEuropaDimensions.size());
 
-        Iterator hcEuropaDimensionsIterator = hcEuropaDimensions.iterator();
+        Iterator<Dimension> hcEuropaDimensionsIterator = hcEuropaDimensions.iterator();
         while (hcEuropaDimensionsIterator.hasNext()) {
             Dimension currDim = (Dimension) hcEuropaDimensionsIterator.next();
             Concept currDimElement = currDim.getConcept();
             assertTrue(currDimElement.getId().equals("t-st_KontinentDimension")
                 || currDimElement.getId().equals("d-la_LaenderDimension"));
             if (currDimElement.getId().equals("t-st_KontinentDimension")) {
-                Set dimensionDomain = hcEuropa
+                Set<ExtendedLinkElement> dimensionDomain = hcEuropa
                     .getDimensionDomain(currDimElement);
                 assertEquals(2, dimensionDomain.size());
                 Concept koKontinente = stTaxonomy
@@ -97,7 +97,7 @@ public final class DefinitionLinkbaseTest {
                 Concept koEuropa = stTaxonomy.getConceptByID("d-ko_Europa");
                 assertNotNull(koKontinente);
                 assertNotNull(koEuropa);
-                Iterator dimensionDomainIterator = dimensionDomain.iterator();
+                Iterator<ExtendedLinkElement> dimensionDomainIterator = dimensionDomain.iterator();
                 while (dimensionDomainIterator.hasNext()) {
                     ExtendedLinkElement currXLinkElement = (ExtendedLinkElement) dimensionDomainIterator
                         .next();
@@ -108,13 +108,12 @@ public final class DefinitionLinkbaseTest {
                         || currDomainElement.getId().equals("d-ko_Europa"));
                 }
             } else if (currDimElement.getId().equals("t-st_LaenderDimension")) {
-                Set dimensionDomain = hcEuropa
+                Set<ExtendedLinkElement> dimensionDomain = hcEuropa
                     .getDimensionDomain(currDimElement);
                 assertEquals(4, dimensionDomain.size());
-                Iterator dimensionDomainIterator = dimensionDomain.iterator();
+                Iterator<ExtendedLinkElement> dimensionDomainIterator = dimensionDomain.iterator();
                 while (dimensionDomainIterator.hasNext()) {
-                    Concept currDomainElement = (Concept) dimensionDomainIterator
-                        .next();
+                	ExtendedLinkElement currDomainElement = dimensionDomainIterator.next();
                     assertTrue(currDomainElement.getId().equals("d-la_Laender")
                         || currDomainElement.getId().equals("d-la_Deutschland")
                         || currDomainElement.getId().equals("d-la_Spanien")
@@ -196,14 +195,13 @@ public final class DefinitionLinkbaseTest {
             .getConceptByID("d-la_LaenderDimension");
         Concept elementCube = stTaxonomy.getConceptByID("t-st_hcEuropa");
 
-        Set dimensionTaxonomySet = stTaxonomy.getDefinitionLinkbase()
+        Set<TaxonomySchema> dimensionTaxonomySet = stTaxonomy.getDefinitionLinkbase()
             .getDimensionTaxonomy(elementKontinent);
-        Set dimensionTaxonomyLandSet = stTaxonomy.getDefinitionLinkbase()
+        Set<TaxonomySchema> dimensionTaxonomyLandSet = stTaxonomy.getDefinitionLinkbase()
             .getDimensionTaxonomy(elementLand);
 
-        Iterator dimensionTaxonomyIterator = dimensionTaxonomySet.iterator();
-        Iterator dimensionTaxonomyLandIterator = dimensionTaxonomyLandSet
-            .iterator();
+        Iterator<TaxonomySchema> dimensionTaxonomyIterator = dimensionTaxonomySet.iterator();
+        Iterator<TaxonomySchema> dimensionTaxonomyLandIterator = dimensionTaxonomyLandSet.iterator();
 
         dimensionTaxonomyIterator.hasNext();
         dimensionTaxonomyLandIterator.hasNext();
@@ -225,7 +223,7 @@ public final class DefinitionLinkbaseTest {
      */
     @Test
     public void getDimensionElements() {
-        Set dimensionsSt = stTaxonomy.getDimensionConceptSet();
+        Set<Concept> dimensionsSt = stTaxonomy.getDimensionConceptSet();
         assertEquals(2, dimensionsSt.size());
     }
 

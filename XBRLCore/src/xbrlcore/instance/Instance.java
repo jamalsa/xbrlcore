@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.jdom.Namespace;
 
@@ -33,22 +34,19 @@ public class Instance implements Serializable {
 
 	private String comment;
 
-	private Set setDts; /*
-						 * all DiscoverableTaxonomySet objects this instance
-						 * refers to
-						 */
+	private Set<DiscoverableTaxonomySet> setDts; /* all DiscoverableTaxonomySet objects this instance refers to */
 
-	private Set factSet; /* all facts contained in this instance */
+	private Set<Fact> factSet; /* all facts contained in this instance */
 
     private Set<Tuple> tupleSet;
 
-	private Map contextMap;
+	private Map<String, InstanceContext> contextMap;
 
-	private Map unitMap;
+	private Map<String, InstanceUnit> unitMap;
 
-	private Map schemaLocationMap;
+	private Map<String, String> schemaLocationMap;
 
-	private transient Set additionalNamespaceSet;
+	private transient Set<Namespace> additionalNamespaceSet;
 
 	private transient Namespace instanceNamespace;
 
@@ -64,19 +62,19 @@ public class Instance implements Serializable {
 	 * in later versions! Instead, all taxonomies the instance refers to are
 	 * represented in a java.util.Set object.
 	 */
-	public Instance(Set discoverableTaxonomySet) {
+	public Instance(Set<DiscoverableTaxonomySet> discoverableTaxonomySet) {
 		setDts = discoverableTaxonomySet;
 
 		/* set instance namespace (can be changed) */
 		instanceNamespace = NamespaceConstants.XBRLI_NAMESPACE;
 
 		/* initialise some objects */
-		factSet = new HashSet();
+		factSet = new HashSet<Fact>();
         tupleSet = new HashSet<Tuple>();
-		additionalNamespaceSet = new HashSet();
-		schemaLocationMap = new HashMap();
-		contextMap = new HashMap();
-		unitMap = new HashMap();
+		additionalNamespaceSet = new HashSet<Namespace>();
+		schemaLocationMap = new HashMap<String, String>();
+		contextMap = new HashMap<String, InstanceContext>();
+		unitMap = new HashMap<String, InstanceUnit>();
 	}
 
 	/**
@@ -96,9 +94,9 @@ public class Instance implements Serializable {
 	 */
 	public void setTaxonomyNamespaces() {
 		/* set namespaces for the imported taxonomies */
-		Iterator setDtsIterator = setDts.iterator();
+		Iterator<DiscoverableTaxonomySet> setDtsIterator = setDts.iterator();
 		while (setDtsIterator.hasNext()) {
-			DiscoverableTaxonomySet currDts = (DiscoverableTaxonomySet) setDtsIterator
+			DiscoverableTaxonomySet currDts = setDtsIterator
 					.next();
 			addNamespacesOfDts(currDts);
 		}
@@ -112,13 +110,12 @@ public class Instance implements Serializable {
 	 *            Discoverable taxonomy set of which namespaces are added.
 	 */
 	private void addNamespacesOfDts(DiscoverableTaxonomySet dts) {
-		Map taxonomiesMap = dts.getTaxonomyMap();
-		Set taxonomiesEntrySet = taxonomiesMap.entrySet();
-		Iterator taxonomiesIterator = taxonomiesEntrySet.iterator();
+		Map<String, TaxonomySchema> taxonomiesMap = dts.getTaxonomyMap();
+		Set<Entry<String, TaxonomySchema>> taxonomiesEntrySet = taxonomiesMap.entrySet();
+		Iterator<Entry<String, TaxonomySchema>> taxonomiesIterator = taxonomiesEntrySet.iterator();
 		while (taxonomiesIterator.hasNext()) {
-			Map.Entry currEntry = (Map.Entry) taxonomiesIterator.next();
-			TaxonomySchema currTaxSchema = (TaxonomySchema) currEntry
-					.getValue();
+			Map.Entry<String, TaxonomySchema> currEntry = taxonomiesIterator.next();
+			TaxonomySchema currTaxSchema = currEntry.getValue();
 			additionalNamespaceSet.add(currTaxSchema.getNamespace());
 		}
 	}
@@ -184,7 +181,7 @@ public class Instance implements Serializable {
 	 */
 	public void addContext(InstanceContext newContext) throws InstanceException {
 
-		InstanceContext tmpCtx = (InstanceContext) contextMap.get(newContext
+		InstanceContext tmpCtx = contextMap.get(newContext
 				.getId());
 		if (tmpCtx != null) {
 			if (!(tmpCtx.equals(newContext)))
@@ -215,7 +212,7 @@ public class Instance implements Serializable {
 	 */
 	public void addUnit(InstanceUnit newUnit) throws InstanceException {
 
-		InstanceUnit tmpUnit = (InstanceUnit) unitMap.get(newUnit.getId());
+		InstanceUnit tmpUnit = unitMap.get(newUnit.getId());
 		if (tmpUnit != null) {
 			if (!(tmpUnit.equals(newUnit)))
 				throw new InstanceException(
@@ -240,7 +237,7 @@ public class Instance implements Serializable {
 	 * @return InstanceContext object if available, otherwise NULL.
 	 */
 	public InstanceContext getContext(String id) {
-		return (InstanceContext) contextMap.get(id);
+		return contextMap.get(id);
 	}
 
 	/**
@@ -252,7 +249,7 @@ public class Instance implements Serializable {
 	 * @return InstanceUnit object if available, otherwise NULL.
 	 */
 	public InstanceUnit getUnit(String id) {
-		return (InstanceUnit) unitMap.get(id);
+		return unitMap.get(id);
 	}
 
 	/**
@@ -262,11 +259,11 @@ public class Instance implements Serializable {
 	 *            ID of the context the returned facts refer to.
 	 * @return List of facts which refer to a certain context.
 	 */
-	public Set getFactsForContext(String context_id) {
-		Set contextFactSet = new HashSet();
-		Iterator factListIterator = factSet.iterator();
+	public Set<Fact> getFactsForContext(String context_id) {
+		Set<Fact> contextFactSet = new HashSet<Fact>();
+		Iterator<Fact> factListIterator = factSet.iterator();
 		while (factListIterator.hasNext()) {
-			Fact currFact = (Fact) factListIterator.next();
+			Fact currFact = factListIterator.next();
 			if (currFact.getInstanceContext().getId().equals(context_id)) {
 				contextFactSet.add(currFact);
 			}
@@ -284,9 +281,9 @@ public class Instance implements Serializable {
 	 * @return The according reported fact.
 	 */
 	public Fact getFact(Concept primaryElement, InstanceContext ctx) {
-		Iterator factListIterator = factSet.iterator();
+		Iterator<Fact> factListIterator = factSet.iterator();
 		while (factListIterator.hasNext()) {
-			Fact currFact = (Fact) factListIterator.next();
+			Fact currFact = factListIterator.next();
 			if (currFact.getConcept().equals(primaryElement)) {
 				if (currFact.getInstanceContext().equals(ctx)) {
 					return currFact;
@@ -313,9 +310,9 @@ public class Instance implements Serializable {
 	 */
 	public Fact getFact(Concept primaryElement, MultipleDimensionType mdt,
 			int scen_seg) {
-		Iterator factListIterator = factSet.iterator();
+		Iterator<Fact> factListIterator = factSet.iterator();
 		while (factListIterator.hasNext()) {
-			Fact currFact = (Fact) factListIterator.next();
+			Fact currFact = factListIterator.next();
 			if (currFact.getConcept().equals(primaryElement)) {
 
 				MultipleDimensionType tmpMDT = currFact.getInstanceContext()
@@ -348,10 +345,10 @@ public class Instance implements Serializable {
 	public InstanceContext getContext(MultipleDimensionType mdt, int scen_seg) {
 		if (mdt == null)
 			return null;
-		Iterator contextIterator = contextMap.keySet().iterator();
+		Iterator<String> contextIterator = contextMap.keySet().iterator();
 		while (contextIterator.hasNext()) {
-			String currID = (String) contextIterator.next();
-			InstanceContext currCtx = (InstanceContext) contextMap.get(currID);
+			String currID = contextIterator.next();
+			InstanceContext currCtx = contextMap.get(currID);
 			if (currCtx.getDimensionalInformation(scen_seg) != null
 					&& currCtx.getDimensionalInformation(scen_seg).equals(mdt)) {
 				return currCtx;
@@ -395,19 +392,19 @@ public class Instance implements Serializable {
 	 *            Context that is removed.
 	 */
 	public void removeContext(InstanceContext contextToRemove) {
-		Set factsToRemoveSet = new HashSet();
-		Iterator factIterator = factSet.iterator();
+		Set<Fact> factsToRemoveSet = new HashSet<Fact>();
+		Iterator<Fact> factIterator = factSet.iterator();
 		/* collect facts to remove */
 		while (factIterator.hasNext()) {
-			Fact currFact = (Fact) factIterator.next();
+			Fact currFact = factIterator.next();
 			if (currFact.getInstanceContext().equals(contextToRemove)) {
 				factsToRemoveSet.add(currFact);
 			}
 		}
 		/* remove the facts */
-		Iterator factsToRemoveIterator = factsToRemoveSet.iterator();
+		Iterator<Fact> factsToRemoveIterator = factsToRemoveSet.iterator();
 		while (factsToRemoveIterator.hasNext()) {
-			Fact currFact = (Fact) factsToRemoveIterator.next();
+			Fact currFact = factsToRemoveIterator.next();
 			removeFact(currFact);
 		}
 		/* remove the context */
@@ -425,11 +422,9 @@ public class Instance implements Serializable {
 		if (instanceNamespace.getPrefix().equals(namespacePrefix)) {
 			return instanceNamespace.getURI();
 		}
-		Iterator additionalNamespaceListIterator = additionalNamespaceSet
-				.iterator();
+		Iterator<Namespace> additionalNamespaceListIterator = additionalNamespaceSet.iterator();
 		while (additionalNamespaceListIterator.hasNext()) {
-			Namespace currNamespace = (Namespace) additionalNamespaceListIterator
-					.next();
+			Namespace currNamespace = additionalNamespaceListIterator.next();
 			if (currNamespace.getPrefix().equals(namespacePrefix)) {
 				return currNamespace.getURI();
 			}
@@ -556,7 +551,7 @@ public class Instance implements Serializable {
 		Namespace newNamespace = Namespace.getNamespace(namespace_prefix,
 				namespace_uri);
 		if (additionalNamespaceSet == null)
-			additionalNamespaceSet = new HashSet();
+			additionalNamespaceSet = new HashSet<Namespace>();
 		additionalNamespaceSet.add(newNamespace);
 	}
 
@@ -568,7 +563,7 @@ public class Instance implements Serializable {
 	 */
 	public void addNamespace(Namespace newNamespace) {
 		if (additionalNamespaceSet == null)
-			additionalNamespaceSet = new HashSet();
+			additionalNamespaceSet = new HashSet<Namespace>();
 		additionalNamespaceSet.add(newNamespace);
 	}
 
@@ -583,11 +578,9 @@ public class Instance implements Serializable {
 		if (instanceNamespace.getURI().equals(namespaceURI)) {
 			return instanceNamespace;
 		}
-		Iterator additionalNamespaceIterator = additionalNamespaceSet
-				.iterator();
+		Iterator<Namespace> additionalNamespaceIterator = additionalNamespaceSet.iterator();
 		while (additionalNamespaceIterator.hasNext()) {
-			Namespace currNamespace = (Namespace) additionalNamespaceIterator
-					.next();
+			Namespace currNamespace = additionalNamespaceIterator.next();
 			if (currNamespace.getURI().equals(namespaceURI)) {
 				return currNamespace;
 			}
@@ -609,18 +602,16 @@ public class Instance implements Serializable {
 		if (ns == null) {
 			return null;
 		}
-		Iterator dtsSetIterator = setDts.iterator();
+		Iterator<DiscoverableTaxonomySet> dtsSetIterator = setDts.iterator();
 		while (dtsSetIterator.hasNext()) {
-			DiscoverableTaxonomySet currDts = (DiscoverableTaxonomySet) dtsSetIterator
+			DiscoverableTaxonomySet currDts = dtsSetIterator
 					.next();
-			Map taxonomyMap = currDts.getTaxonomyMap();
-			Iterator taxonomyEntrySetIterator = taxonomyMap.entrySet()
+			Map<String, TaxonomySchema> taxonomyMap = currDts.getTaxonomyMap();
+			Iterator<Entry<String, TaxonomySchema>> taxonomyEntrySetIterator = taxonomyMap.entrySet()
 					.iterator();
 			while (taxonomyEntrySetIterator.hasNext()) {
-				Map.Entry currEntry = (Map.Entry) taxonomyEntrySetIterator
-						.next();
-				TaxonomySchema currTaxonomy = (TaxonomySchema) currEntry
-						.getValue();
+				Map.Entry<String, TaxonomySchema> currEntry = taxonomyEntrySetIterator.next();
+				TaxonomySchema currTaxonomy = currEntry.getValue();
 				if (currTaxonomy.getNamespace().equals(ns)) {
 					return currTaxonomy;
 				}
@@ -645,24 +636,24 @@ public class Instance implements Serializable {
 	}
 
 	/**
-	 * @return Set with all the contextes in this instance (key - ID of the
+	 * @return Set with all the contexts in this instance (key - ID of the
 	 *         context, value - according InstanceContext object).
 	 */
-	public Map getContextMap() {
+	public Map<String, InstanceContext> getContextMap() {
 		return contextMap;
 	}
 
 	/**
 	 * @return List with all the facts in this instance.
 	 */
-	public Set getFactSet() {
+	public Set<Fact> getFactSet() {
 		return factSet;
 	}
 
 	/**
      * @return List with all the tuples in this instance.
      */
-    public Set getTupleSet() {
+    public Set<Tuple> getTupleSet() {
         return tupleSet;
     }
 
@@ -670,7 +661,7 @@ public class Instance implements Serializable {
     /**
 	 * @return All taxonomies this instance refers to.
 	 */
-	public Set getDiscoverableTaxonomySet() {
+	public Set<DiscoverableTaxonomySet> getDiscoverableTaxonomySet() {
 		return setDts;
 	}
 
@@ -678,7 +669,7 @@ public class Instance implements Serializable {
 	 * @return Set with all the additional namespaces of the instance document.
 	 *         This is a list of JDOM Namespace objects.
 	 */
-	public Set getAdditionalNamespaceSet() {
+	public Set<Namespace> getAdditionalNamespaceSet() {
 		return additionalNamespaceSet;
 	}
 
@@ -700,15 +691,15 @@ public class Instance implements Serializable {
 	 * @return Map which contains schema location information. Key is the schema
 	 *         URI, value is the schema name.
 	 */
-	public Map getSchemaLocationMap() {
+	public Map<String, String> getSchemaLocationMap() {
 		return schemaLocationMap;
 	}
 
 	/**
-	 * @return Map which contains unit informaion. Key is the ID of the unit,
+	 * @return Map which contains unit information. Key is the ID of the unit,
 	 *         value is the according xbrlcore.instance.InstanceUnit object.
 	 */
-	public Map getUnitMap() {
+	public Map<String, InstanceUnit> getUnitMap() {
 		return unitMap;
 	}
 

@@ -59,7 +59,7 @@ public class RoleType implements Serializable {
      * 
      * @return definition list of the RoleType.
      */
-	public List getDefinition() {
+	public List<String> getDefinition() {
 		return definition;
 	}
 
@@ -67,7 +67,7 @@ public class RoleType implements Serializable {
      * @param definition
      *            definition list of the RoleType.
      */
-	public void setDefinition(List definition) {
+	public void setDefinition(List<String> definition) {
 		this.definition = definition;
 	}
 
@@ -75,7 +75,7 @@ public class RoleType implements Serializable {
      * 
      * @return usedOn list of the RoleType.
      */
-	public List getUsedOn() {
+	public List<String> getUsedOn() {
 		return usedOn;
 	}
 
@@ -83,7 +83,7 @@ public class RoleType implements Serializable {
      * @param usedOn
      *            usedOn list of the RoleType.
      */
-	public void setUsedOn(List usedOn) {
+	public void setUsedOn(List<String> usedOn) {
 		this.usedOn = usedOn;
 	}
 }

@@ -62,7 +62,7 @@ public final class XBRLLinkbaseTest {
     public void getXLinkElementByLabel() {
         LabelLinkbase labelLinkbase = prTaxonomy.getLabelLinkbase();
 
-        List xLinkElementProdukteList = labelLinkbase.getExtendedLinkElements(
+        List<ExtendedLinkElement> xLinkElementProdukteList = labelLinkbase.getExtendedLinkElements(
             "label_Produkte", null, null);
         assertEquals(1, xLinkElementProdukteList.size());
         ExtendedLinkElement xLinkElementProdukte = (ExtendedLinkElement) xLinkElementProdukteList
@@ -76,7 +76,7 @@ public final class XBRLLinkbaseTest {
         assertEquals("Produkte (domain)", ((Resource) xLinkElementProdukte)
             .getValue());
 
-        List xLinkElementProdukte2List = labelLinkbase.getExtendedLinkElements(
+        List<ExtendedLinkElement> xLinkElementProdukte2List = labelLinkbase.getExtendedLinkElements(
             "label_Produkte_2", null, null);
         assertEquals(1, xLinkElementProdukte2List.size());
         ExtendedLinkElement xLinkElementProdukte2 = (ExtendedLinkElement) xLinkElementProdukte2List
@@ -85,7 +85,7 @@ public final class XBRLLinkbaseTest {
         assertEquals("Products (domain)", ((Resource) xLinkElementProdukte2)
             .getValue());
 
-        List xLinkElementEssenList = labelLinkbase.getExtendedLinkElements(
+        List<ExtendedLinkElement> xLinkElementEssenList = labelLinkbase.getExtendedLinkElements(
             "Essen", "http://www.xbrl.org/2003/role/link", null);
         assertEquals(1, xLinkElementEssenList.size());
         ExtendedLinkElement xLinkElementEssen = (ExtendedLinkElement) xLinkElementEssenList
@@ -119,9 +119,9 @@ public final class XBRLLinkbaseTest {
 
         Concept elementEssen = prTaxonomy.getConceptByID("p-pr_Essen");
         Concept elementGetraenke = prTaxonomy.getConceptByID("p-pr_Getraenke");
-        List xLinkElementListEssen = presentationLinkbase
+        List<ExtendedLinkElement> xLinkElementListEssen = presentationLinkbase
             .getTargetExtendedLinkElements(elementEssen, null);
-        List xLinkElementListGetraenke = presentationLinkbase
+        List<ExtendedLinkElement> xLinkElementListGetraenke = presentationLinkbase
             .getTargetExtendedLinkElements(elementGetraenke, null);
         assertEquals(2, xLinkElementListEssen.size());
         assertEquals(3, xLinkElementListGetraenke.size());
@@ -141,7 +141,7 @@ public final class XBRLLinkbaseTest {
             .getPresentationLinkbase();
 
         Concept elementWurst = prTaxonomy.getConceptByID("p-pr_Wurst");
-        List xLinkElementList = presentationLinkbase
+        List<ExtendedLinkElement> xLinkElementList = presentationLinkbase
             .getSourceExtendedLinkElements(elementWurst,
                 "http://www.xbrl.org/2003/role/link");
         assertEquals(1, xLinkElementList.size());
@@ -162,7 +162,7 @@ public final class XBRLLinkbaseTest {
         PresentationLinkbase presentationLinkbase = prTaxonomy
             .getPresentationLinkbase();
 
-        List xArcList = presentationLinkbase.getArcBaseSet(
+        List<Arc> xArcList = presentationLinkbase.getArcBaseSet(
             "http://www.xbrl.org/2003/arcrole/parent-child", null);
         assertEquals(10, xArcList.size());
 
@@ -174,11 +174,11 @@ public final class XBRLLinkbaseTest {
         assertNull(xArc.getTargetRole());
         assertEquals(new Float(1.0f), new Float(xArc.getOrder()));
 
-        List arcroleList = new ArrayList();
+        List<String> arcroleList = new ArrayList<String>();
         arcroleList.add("test");
         arcroleList.add("quatsch");
         arcroleList.add("http://www.xbrl.org/2003/arcrole/parent-child");
-        List xArcList2 = presentationLinkbase.getArcBaseSet(arcroleList,
+        List<Arc> xArcList2 = presentationLinkbase.getArcBaseSet(arcroleList,
             "http://www.xbrl.org/2003/role/link");
         assertEquals(xArcList, xArcList2);
     }
@@ -189,11 +189,11 @@ public final class XBRLLinkbaseTest {
     @Test
     public void buildSourceNetwork() {
         DefinitionLinkbase defLinkbase = prTaxonomy.getDefinitionLinkbase();
-        Set sourceNetwork = defLinkbase.buildSourceNetwork(prTaxonomy
+        Set<ExtendedLinkElement> sourceNetwork = defLinkbase.buildSourceNetwork(prTaxonomy
             .getConceptByID("p-pr_Bier"),
             "http://xbrl.org/int/dim/arcrole/domain-member", null);
         assertEquals(3, sourceNetwork.size());
-        Iterator sourceNetworkIterator = sourceNetwork.iterator();
+        Iterator<ExtendedLinkElement> sourceNetworkIterator = sourceNetwork.iterator();
         while (sourceNetworkIterator.hasNext()) {
             Concept currCon = ((Locator) (ExtendedLinkElement) sourceNetworkIterator
                 .next()).getConcept();
@@ -232,7 +232,7 @@ public final class XBRLLinkbaseTest {
     public void buildTargetNetwork() {
         try {
             DefinitionLinkbase defLinkbase = prTaxonomy.getDefinitionLinkbase();
-            Set targetNetwork = defLinkbase.buildTargetNetwork(prTaxonomy
+            Set<ExtendedLinkElement> targetNetwork = defLinkbase.buildTargetNetwork(prTaxonomy
                 .getConceptByID("p-pr_Produkte"),
                 "http://xbrl.org/int/dim/arcrole/domain-member", null);
             assertEquals(10, targetNetwork.size());

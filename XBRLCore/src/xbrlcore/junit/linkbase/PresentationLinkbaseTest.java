@@ -95,7 +95,7 @@ public final class PresentationLinkbaseTest {
     @Test
     public void getPresentationLinkbaseElementList() {
         try {
-            List presentationLinkbaseElementList = presentationLinkbase
+            List<PresentationLinkbaseElement> presentationLinkbaseElementList = presentationLinkbase
                 .getPresentationList(prTaxonomy.getTopTaxonomy().getName(),
                     "http://www.xbrl.org/2003/role/link");
             assertNotNull(presentationLinkbaseElementList);
@@ -105,7 +105,7 @@ public final class PresentationLinkbaseTest {
             assertNotNull(presentationLinkbaseElementList);
             assertEquals(11, presentationLinkbaseElementList.size());
 
-            Iterator presentationLinkbaseElementListIterator = presentationLinkbaseElementList
+            Iterator<PresentationLinkbaseElement> presentationLinkbaseElementListIterator = presentationLinkbaseElementList
                 .iterator();
             int i = 0;
             while (presentationLinkbaseElementListIterator.hasNext()) {

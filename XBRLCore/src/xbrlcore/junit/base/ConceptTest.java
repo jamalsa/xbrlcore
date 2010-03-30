@@ -69,7 +69,7 @@ public final class ConceptTest {
     @Test
     public void conceptsCore() {
         final int NUMBER_OF_EXPECTED_CONCEPTS = 13;
-        Set conceptSet = prTaxonomy.getConcepts();
+        Set<Concept> conceptSet = prTaxonomy.getConcepts();
 
         /* 11 elements from p-pr and 2 elements from xbrldt */
         assertEquals(NUMBER_OF_EXPECTED_CONCEPTS, conceptSet.size());

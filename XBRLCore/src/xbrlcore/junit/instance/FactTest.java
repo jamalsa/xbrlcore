@@ -49,7 +49,8 @@ public final class FactTest {
         try {
             Concept c = prDTS.getConceptByID("p-pr_Essen");
             try {
-                Fact f = new Fact(c);
+                @SuppressWarnings("unused")
+				Fact f = new Fact(c);
                 fail("InstanceException not thrown");
             } catch (InstanceException ex) {
             }

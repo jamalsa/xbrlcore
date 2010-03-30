@@ -46,9 +46,9 @@ public class CalculationLinkbase extends Linkbase {
 	 * @return A Map with concepts as keys and their according weight attribute
 	 *         (calc. rule) as values.
 	 */
-	public Map getCalculations(Concept concept, String extendedLinkRole)
+	public Map<Concept, Float> getCalculations(Concept concept, String extendedLinkRole)
 			throws XBRLException {
-		Map returnMap = new HashMap();
+		Map<Concept, Float> returnMap = new HashMap<Concept, Float>();
 
 		ExtendedLinkElement ex = getExtendedLinkElementFromBaseSet(concept,
 				extendedLinkRole);
@@ -57,7 +57,7 @@ public class CalculationLinkbase extends Linkbase {
 			return returnMap;
 		}
 
-		List arcList = getTargetArcsFromExtendedLinkElement(ex,
+		List<Arc> arcList = getTargetArcsFromExtendedLinkElement(ex,
 				GeneralConstants.XBRL_SUMMATION_ITEM_ARCROLE, extendedLinkRole);
 
 		for (int i = 0; i < arcList.size(); i++) {

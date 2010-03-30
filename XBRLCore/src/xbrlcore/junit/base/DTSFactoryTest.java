@@ -59,7 +59,7 @@ public final class DTSFactoryTest {
     public void importedTaxonomies() {
         final int NUMBER_OF_EXPECTED_TAXONOMIES = 6;
 
-        Map dts = prTaxonomy.getTaxonomyMap();
+        Map<String, TaxonomySchema> dts = prTaxonomy.getTaxonomyMap();
         assertEquals(NUMBER_OF_EXPECTED_TAXONOMIES, dts.size());
 
         TaxonomySchema xbrlInstance = prTaxonomy

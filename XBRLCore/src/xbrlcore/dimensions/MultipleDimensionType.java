@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.jdom.Element;
 
@@ -28,7 +29,7 @@ public class MultipleDimensionType implements Serializable, Cloneable {
 
     private SingleDimensionType presentDimensionDomain;
 
-    private Set predecessorDimensionDomainSet;
+    private Set<SingleDimensionType> predecessorDimensionDomainSet;
 
     /**
      * Constructor.
@@ -47,7 +48,7 @@ public class MultipleDimensionType implements Serializable, Cloneable {
             presentDimensionDomain = new SingleDimensionType(dimensionElement,
                     new Element("a"));
         }
-        predecessorDimensionDomainSet = new HashSet();
+        predecessorDimensionDomainSet = new HashSet<SingleDimensionType>();
     }
 
     /**
@@ -59,7 +60,7 @@ public class MultipleDimensionType implements Serializable, Cloneable {
      */
     public MultipleDimensionType(SingleDimensionType sdt) {
         presentDimensionDomain = sdt;
-        predecessorDimensionDomainSet = new HashSet();
+        predecessorDimensionDomainSet = new HashSet<SingleDimensionType>();
     }
 
     /**
@@ -67,11 +68,9 @@ public class MultipleDimensionType implements Serializable, Cloneable {
      */
     public Object clone() throws CloneNotSupportedException {
         MultipleDimensionType newMDT = (MultipleDimensionType) super.clone();
-        newMDT
-                .setPresentDimensionDomain((SingleDimensionType) presentDimensionDomain
+        newMDT.setPresentDimensionDomain((SingleDimensionType) presentDimensionDomain
                         .clone());
-        newMDT
-                .setPredecessorDimensionDomainSet((Set) ((HashSet) predecessorDimensionDomainSet)
+        newMDT.setPredecessorDimensionDomainSet((Set<SingleDimensionType>) ((HashSet<SingleDimensionType>) predecessorDimensionDomainSet)
                         .clone());
         return newMDT;
     }
@@ -193,10 +192,10 @@ public class MultipleDimensionType implements Serializable, Cloneable {
                 dimensionElement)) {
             return presentDimensionDomain;
         }
-        Iterator predecessorDimensionDomainIterator = predecessorDimensionDomainSet
+        Iterator<SingleDimensionType> predecessorDimensionDomainIterator = predecessorDimensionDomainSet
                 .iterator();
         while (predecessorDimensionDomainIterator.hasNext()) {
-            SingleDimensionType currSDT = (SingleDimensionType) predecessorDimensionDomainIterator
+            SingleDimensionType currSDT = predecessorDimensionDomainIterator
                     .next();
             if (currSDT.getDimensionConcept().equals(dimensionElement)) {
                 return currSDT;
@@ -219,16 +218,16 @@ public class MultipleDimensionType implements Serializable, Cloneable {
             return false;
         MultipleDimensionType newType = (MultipleDimensionType) obj;
 
-        Map thisDimensionDomainMap = getAllDimensionDomainMap();
-        Map otherDimensionDomainMap = newType.getAllDimensionDomainMap();
+        Map<Concept, Concept> thisDimensionDomainMap = getAllDimensionDomainMap();
+        Map<Concept, Concept> otherDimensionDomainMap = newType.getAllDimensionDomainMap();
         if (thisDimensionDomainMap.size() != otherDimensionDomainMap.size()) {
             return false;
         }
 
-        Iterator thisDimensionDomainIterator = thisDimensionDomainMap
+        Iterator<Entry<Concept, Concept>> thisDimensionDomainIterator = thisDimensionDomainMap
                 .entrySet().iterator();
         while (thisDimensionDomainIterator.hasNext()) {
-            Map.Entry currEntry = (Map.Entry) thisDimensionDomainIterator
+            Map.Entry<Concept, Concept> currEntry = thisDimensionDomainIterator
                     .next();
             Concept currDimConcept = (Concept) currEntry.getKey();
             if (!otherDimensionDomainMap.containsKey(currDimConcept)) {
@@ -256,18 +255,18 @@ public class MultipleDimensionType implements Serializable, Cloneable {
             return false;
         MultipleDimensionType newType = (MultipleDimensionType) obj;
 
-        List thisSingleDimensionTypeList = getAllSingleDimensionTypeList();
-        List otherSingleDimensionTypeList = newType
+        List<SingleDimensionType> thisSingleDimensionTypeList = getAllSingleDimensionTypeList();
+        List<SingleDimensionType> otherSingleDimensionTypeList = newType
                 .getAllSingleDimensionTypeList();
         if (thisSingleDimensionTypeList.size() != otherSingleDimensionTypeList
                 .size()) {
             return false;
         }
 
-        Iterator thisSingleDimensionTypeIterator = thisSingleDimensionTypeList
+        Iterator<SingleDimensionType> thisSingleDimensionTypeIterator = thisSingleDimensionTypeList
                 .iterator();
         while (thisSingleDimensionTypeIterator.hasNext()) {
-            SingleDimensionType currSingleDimensionType = (SingleDimensionType) thisSingleDimensionTypeIterator
+            SingleDimensionType currSingleDimensionType = thisSingleDimensionTypeIterator
                     .next();
             if (!otherSingleDimensionTypeList.contains(currSingleDimensionType)) {
                 return false;
@@ -292,13 +291,13 @@ public class MultipleDimensionType implements Serializable, Cloneable {
      *         java.util.List object.
      */
     /* TODO: Unit Test Missing! */
-    public List getAllDimensions() {
-        List dimensionList = new ArrayList();
+    public List<Concept> getAllDimensions() {
+        List<Concept> dimensionList = new ArrayList<Concept>();
         dimensionList.add(presentDimensionDomain.getDimensionConcept());
-        Iterator predecessorDimensionDomainIterator = predecessorDimensionDomainSet
+        Iterator<SingleDimensionType> predecessorDimensionDomainIterator = predecessorDimensionDomainSet
                 .iterator();
         while (predecessorDimensionDomainIterator.hasNext()) {
-            SingleDimensionType sdt = (SingleDimensionType) predecessorDimensionDomainIterator
+            SingleDimensionType sdt = predecessorDimensionDomainIterator
                     .next();
             dimensionList.add(sdt.getDimensionConcept());
         }
@@ -318,10 +317,10 @@ public class MultipleDimensionType implements Serializable, Cloneable {
         if (presentDimensionDomain.getDimensionConcept().equals(dimension)) {
             return presentDimensionDomain.getDomainMemberConcept();
         }
-        Iterator predecessorDimensionDomainIterator = predecessorDimensionDomainSet
+        Iterator<SingleDimensionType> predecessorDimensionDomainIterator = predecessorDimensionDomainSet
                 .iterator();
         while (predecessorDimensionDomainIterator.hasNext()) {
-            SingleDimensionType currSDT = (SingleDimensionType) predecessorDimensionDomainIterator
+            SingleDimensionType currSDT = predecessorDimensionDomainIterator
                     .next();
             if (currSDT.getDimensionConcept().equals(dimension)) {
                 return currSDT.getDomainMemberConcept();
@@ -349,12 +348,12 @@ public class MultipleDimensionType implements Serializable, Cloneable {
      *         Concept dimension object, the value is the Concept domain
      *         object).
      */
-    public Map getPredecessorDimensionDomainMap() {
-        Map returnMap = new HashMap();
-        Iterator predecessorDimensionDomainIterator = predecessorDimensionDomainSet
+    public Map<Concept, Concept> getPredecessorDimensionDomainMap() {
+        Map<Concept, Concept> returnMap = new HashMap<Concept, Concept>();
+        Iterator<SingleDimensionType> predecessorDimensionDomainIterator = predecessorDimensionDomainSet
                 .iterator();
         while (predecessorDimensionDomainIterator.hasNext()) {
-            SingleDimensionType currentSDT = (SingleDimensionType) predecessorDimensionDomainIterator
+            SingleDimensionType currentSDT = predecessorDimensionDomainIterator
                     .next();
             returnMap.put(currentSDT.getDimensionConcept(), currentSDT
                     .getDomainMemberConcept());
@@ -370,16 +369,16 @@ public class MultipleDimensionType implements Serializable, Cloneable {
      *         combinations (the key is the Concept dimension object, the value
      *         is the Concept domain object).
      */
-    public Map getAllDimensionDomainMap() {
-        Map allDimensionDomain = new HashMap();
+    public Map<Concept, Concept> getAllDimensionDomainMap() {
+        Map<Concept, Concept> allDimensionDomain = new HashMap<Concept, Concept>();
         allDimensionDomain.put(presentDimensionDomain.getDimensionConcept(),
                 presentDimensionDomain.getDomainMemberConcept());
         allDimensionDomain.putAll(getPredecessorDimensionDomainMap());
         return allDimensionDomain;
     }
 
-    public List getAllSingleDimensionTypeList() {
-        List returnList = new ArrayList();
+    public List<SingleDimensionType> getAllSingleDimensionTypeList() {
+        List<SingleDimensionType> returnList = new ArrayList<SingleDimensionType>();
         returnList.add(presentDimensionDomain);
         returnList.addAll(predecessorDimensionDomainSet);
         return returnList;
@@ -404,7 +403,7 @@ public class MultipleDimensionType implements Serializable, Cloneable {
      * @return All dimension / domain combinations except the first one
      *         (java.util.Set of SingleDimensionType objects).
      */
-    public Set getPredecessorDimensionDomainSet() {
+    public Set<SingleDimensionType> getPredecessorDimensionDomainSet() {
         return predecessorDimensionDomainSet;
     }
 
@@ -421,7 +420,7 @@ public class MultipleDimensionType implements Serializable, Cloneable {
      *            The predecessorDimensionDomainSet to set.
      */
     public void setPredecessorDimensionDomainSet(
-            Set predecessorDimensionDomainSet) {
+            Set<SingleDimensionType> predecessorDimensionDomainSet) {
         this.predecessorDimensionDomainSet = predecessorDimensionDomainSet;
     }
 
@@ -445,10 +444,10 @@ public class MultipleDimensionType implements Serializable, Cloneable {
                     + "\n";
         }
         output += "All predecessor dimension / domain combinations:\n";
-        Iterator predecessorDimensionDomainIterator = predecessorDimensionDomainSet
+        Iterator<SingleDimensionType> predecessorDimensionDomainIterator = predecessorDimensionDomainSet
                 .iterator();
         while (predecessorDimensionDomainIterator.hasNext()) {
-            SingleDimensionType currSDT = (SingleDimensionType) predecessorDimensionDomainIterator
+            SingleDimensionType currSDT = predecessorDimensionDomainIterator
                     .next();
             if (presentDimensionDomain.isTypedDimension()) {
                 output += currSDT.getDimensionConcept().getId() + " "

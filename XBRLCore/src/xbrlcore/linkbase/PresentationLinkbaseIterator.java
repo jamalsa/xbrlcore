@@ -10,13 +10,13 @@ import java.util.List;
  * 
  * @author Daniel Hamm
  */
-public class PresentationLinkbaseIterator implements Iterator {
+public class PresentationLinkbaseIterator implements Iterator<PresentationLinkbaseElement> {
 
-	private List elementList;
+	private List<PresentationLinkbaseElement> elementList;
 
 	private int counter;
 
-	public PresentationLinkbaseIterator(List elementList) {
+	public PresentationLinkbaseIterator(List<PresentationLinkbaseElement> elementList) {
 		this.elementList = elementList;
 		counter = 0;
 	}
@@ -46,7 +46,7 @@ public class PresentationLinkbaseIterator implements Iterator {
 	 * 
 	 * @see java.util.Iterator#next()
 	 */
-	public Object next() {
+	public PresentationLinkbaseElement next() {
 		return elementList.get(counter++);
 	}
 

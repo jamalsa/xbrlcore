@@ -5,8 +5,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import xbrlcore.taxonomy.Concept;
+import xbrlcore.xlink.ExtendedLinkElement;
 import xbrlcore.xlink.Locator;
 
 /**
@@ -29,7 +31,7 @@ public class Hypercube implements Serializable {
 
 	private String extendedLinkRole;
 
-	private Set dimensionSet; /* Dimension objects */
+	private Set<Dimension> dimensionSet; /* Dimension objects */
 
 	/**
 	 * This method tests for "equality" between two Hypercube objects. They are
@@ -72,7 +74,7 @@ public class Hypercube implements Serializable {
 	 */
 	public Hypercube(Concept concept) {
 		this.concept = concept;
-		dimensionSet = new HashSet();
+		dimensionSet = new HashSet<Dimension>();
 		extendedLinkRole = null;
 	}
 
@@ -94,10 +96,10 @@ public class Hypercube implements Serializable {
 	 * @return A list with xbrlcore.xlink.ExtendedLinkElement objects
 	 *         representing the domain of the dimension.
 	 */
-	public Set getDimensionDomain(Concept dimension) {
-		Iterator dimensionIterator = dimensionSet.iterator();
+	public Set<ExtendedLinkElement> getDimensionDomain(Concept dimension) {
+		Iterator<Dimension> dimensionIterator = dimensionSet.iterator();
 		while (dimensionIterator.hasNext()) {
-			Dimension currDimension = (Dimension) dimensionIterator.next();
+			Dimension currDimension = dimensionIterator.next();
 			if (currDimension.getConcept().equals(dimension)) {
 				return currDimension.getDomainMemberSet();
 			}
@@ -113,9 +115,9 @@ public class Hypercube implements Serializable {
 	 * @return True if the dimension is part of that cube, otherwise false.
 	 */
 	public boolean containsDimension(Concept dimension) {
-		Iterator dimensionIterator = dimensionSet.iterator();
+		Iterator<Dimension> dimensionIterator = dimensionSet.iterator();
 		while (dimensionIterator.hasNext()) {
-			Dimension currDimension = (Dimension) dimensionIterator.next();
+			Dimension currDimension = dimensionIterator.next();
 			if (currDimension.getConcept().equals(dimension)) {
 				return true;
 			}
@@ -132,8 +134,8 @@ public class Hypercube implements Serializable {
      * @return True if all dimensions of the set are part of that cube,
      *         otherwise false.
      */
-    public boolean containsDimension(Set dimension) {
-        Iterator dimensionIterator = dimension.iterator();
+    public boolean containsDimension(Set<Concept> dimension) {
+        Iterator<Concept> dimensionIterator = dimension.iterator();
         while (dimensionIterator.hasNext()) {
             Concept currConcept = (Concept) dimensionIterator.next();
             if (!containsDimension(currConcept)) {
@@ -159,9 +161,9 @@ public class Hypercube implements Serializable {
 	 */
 	public boolean containsDimensionDomain(Concept dimension,
 			Concept domainMember) {
-		Iterator dimensionIterator = dimensionSet.iterator();
+		Iterator<Dimension> dimensionIterator = dimensionSet.iterator();
 		while (dimensionIterator.hasNext()) {
-			Dimension currDimension = (Dimension) dimensionIterator.next();
+			Dimension currDimension = dimensionIterator.next();
 			if (currDimension.getConcept().equals(dimension)) {
 				/*
 				 * TODO: a typed dimension always returns "true", so ALL
@@ -192,9 +194,9 @@ public class Hypercube implements Serializable {
 	 */
 	public boolean containsUsableDimensionDomain(Concept dimension,
 			Concept domainMember) {
-		Iterator dimensionIterator = dimensionSet.iterator();
+		Iterator<Dimension> dimensionIterator = dimensionSet.iterator();
 		while (dimensionIterator.hasNext()) {
-			Dimension currDimension = (Dimension) dimensionIterator.next();
+			Dimension currDimension = dimensionIterator.next();
 			if (currDimension.getConcept().equals(dimension)) {
 				/*
 				 * TODO: a typed dimension always returns "true", so ALL
@@ -226,17 +228,17 @@ public class Hypercube implements Serializable {
 	public void addHypercube(Hypercube newCube)
 			throws CloneNotSupportedException {
 		/* go through all the dimensions of newCube */
-		Set newDimensionSet = newCube.getDimensionSet();
-		Iterator newDimensionSetIterator = newDimensionSet.iterator();
+		Set<Dimension> newDimensionSet = newCube.getDimensionSet();
+		Iterator<Dimension> newDimensionSetIterator = newDimensionSet.iterator();
 		while (newDimensionSetIterator.hasNext()) {
-			Dimension newCubeDimension = (Dimension) newDimensionSetIterator
+			Dimension newCubeDimension = newDimensionSetIterator
 					.next();
 			/* if it is contained in this cube, add only the domain members */
 			if (containsDimension(newCubeDimension.getConcept())) {
 				Dimension thisDimension = getDimension(newCubeDimension
 						.getConcept());
 				thisDimension
-						.addDomainMemberSet((Set) ((HashSet) newCubeDimension
+						.addDomainMemberSet((Set<ExtendedLinkElement>) ((HashSet<ExtendedLinkElement>) newCubeDimension
 								.getDomainMemberSet()).clone());
 			}
 			/*
@@ -256,12 +258,12 @@ public class Hypercube implements Serializable {
 	public String toString() {
 		String id = (concept != null ? concept.getId() : "anonymous");
 		String str = "Hypercube " + id + "\n";
-		Iterator dimensionIterator = dimensionSet.iterator();
+		Iterator<Dimension> dimensionIterator = dimensionSet.iterator();
 		while (dimensionIterator.hasNext()) {
-			Dimension currDim = (Dimension) dimensionIterator.next();
+			Dimension currDim = dimensionIterator.next();
 			str += "\tDimension: " + currDim.getConcept().getId() + "\n";
-			Set domainMemberSet = currDim.getDomainMemberSet();
-			Iterator domainMemberIterator = domainMemberSet.iterator();
+			Set<ExtendedLinkElement> domainMemberSet = currDim.getDomainMemberSet();
+			Iterator<ExtendedLinkElement> domainMemberIterator = domainMemberSet.iterator();
 			while (domainMemberIterator.hasNext()) {
 				Concept currCon = ((Locator) domainMemberIterator.next())
 						.getConcept();
@@ -287,14 +289,14 @@ public class Hypercube implements Serializable {
 	 *         false is returned.
 	 */
     public boolean hasDimensionDomainCombination(MultipleDimensionType mdt) {
-		Map dimensionDomainMap = mdt.getAllDimensionDomainMap();
+		Map<Concept, Concept> dimensionDomainMap = mdt.getAllDimensionDomainMap();
 		if (dimensionDomainMap.size() != dimensionSet.size()) {
 			return false;
 		}
-		Set dimensionDomainEntrySet = dimensionDomainMap.entrySet();
-		Iterator dimensionDomainIterator = dimensionDomainEntrySet.iterator();
+		Set<Entry<Concept, Concept>> dimensionDomainEntrySet = dimensionDomainMap.entrySet();
+		Iterator<Entry<Concept, Concept>> dimensionDomainIterator = dimensionDomainEntrySet.iterator();
 		while (dimensionDomainIterator.hasNext()) {
-			Map.Entry currEntry = (Map.Entry) dimensionDomainIterator.next();
+			Map.Entry<Concept,Concept> currEntry = dimensionDomainIterator.next();
 			Concept currDimConcept = (Concept) currEntry.getKey();
 			Concept currDomConcept = (Concept) currEntry.getValue();
 			if (!containsUsableDimensionDomain(currDimConcept, currDomConcept)) {
@@ -322,14 +324,14 @@ public class Hypercube implements Serializable {
         if (mdt == null) {
             return false;
         }
-        Map dimensionDomainMap = mdt.getAllDimensionDomainMap();
+        Map<Concept, Concept> dimensionDomainMap = mdt.getAllDimensionDomainMap();
         if (dimensionDomainMap.size() != dimensionSet.size()) {
             return false;
         }
-        Set dimensionDomainEntrySet = dimensionDomainMap.entrySet();
-        Iterator dimensionDomainIterator = dimensionDomainEntrySet.iterator();
+        Set<Entry<Concept, Concept>> dimensionDomainEntrySet = dimensionDomainMap.entrySet();
+        Iterator<Entry<Concept, Concept>> dimensionDomainIterator = dimensionDomainEntrySet.iterator();
         while (dimensionDomainIterator.hasNext()) {
-            Map.Entry currEntry = (Map.Entry) dimensionDomainIterator.next();
+            Map.Entry<Concept, Concept> currEntry = dimensionDomainIterator.next();
             Concept currDimConcept = (Concept) currEntry.getKey();
             if (!containsDimension(currDimConcept)) {
                 return false;
@@ -346,9 +348,9 @@ public class Hypercube implements Serializable {
 	 * @return Dimension object matching the given Concept object.
 	 */
 	public Dimension getDimension(Concept dimensionElement) {
-		Iterator dimensionIterator = dimensionSet.iterator();
+		Iterator<Dimension> dimensionIterator = dimensionSet.iterator();
 		while (dimensionIterator.hasNext()) {
-			Dimension currDimension = (Dimension) dimensionIterator.next();
+			Dimension currDimension = dimensionIterator.next();
 			if (currDimension.getConcept().equals(dimensionElement)) {
 				return currDimension;
 			}
@@ -382,7 +384,7 @@ public class Hypercube implements Serializable {
      * @return Set with Dimension objects representing all the set of Dimensions
      *         this hypercube consists of.
 	 */
-	public Set getDimensionSet() {
+	public Set<Dimension> getDimensionSet() {
 		return dimensionSet;
 	}
 
@@ -391,11 +393,11 @@ public class Hypercube implements Serializable {
      * @return Set with Concept objects representing all the dimensions this
      *         hypercube consists of.
      */
-    public Set getDimensionConceptSet() {
-        Set dimensionConceptSet = new HashSet();
-        Iterator dimensionSetIterator = dimensionSet.iterator();
+    public Set<Concept> getDimensionConceptSet() {
+        Set<Concept> dimensionConceptSet = new HashSet<Concept>();
+        Iterator<Dimension> dimensionSetIterator = dimensionSet.iterator();
         while (dimensionSetIterator.hasNext()) {
-            Dimension d = (Dimension) dimensionSetIterator.next();
+            Dimension d = dimensionSetIterator.next();
             dimensionConceptSet.add(d.getConcept());
         }
         return dimensionConceptSet;
@@ -407,9 +409,9 @@ public class Hypercube implements Serializable {
      *         otherwise false.
      */
     public boolean containsTypedDimension() {
-        Iterator dimensionIterator = dimensionSet.iterator();
+        Iterator<Dimension> dimensionIterator = dimensionSet.iterator();
         while (dimensionIterator.hasNext()) {
-            Dimension d = (Dimension) dimensionIterator.next();
+            Dimension d = dimensionIterator.next();
             if (d.isTyped()) {
                 return true;
             }

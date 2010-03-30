@@ -85,9 +85,8 @@ public final class MultipleDimensionTypeTest {
             mdt.overrideDimensionDomain(new SingleDimensionType(
                 kontinentDimension2, kontinentAsien));
 
-            Map map = mdt.getPredecessorDimensionDomainMap();
-            Concept currKontinentElement = (Concept) map
-                .get(kontinentDimension);
+            Map<Concept, Concept> map = mdt.getPredecessorDimensionDomainMap();
+            Concept currKontinentElement = map.get(kontinentDimension);
             /*
              * domain kontinentAsien has overridden the domain kontinentEuropa
              * of dimension kontinentDimension

@@ -83,7 +83,7 @@ public final class DTSExtendedLinkbaseTests {
              * there are four arcs, but one prohibits another, so there must
              * only be two arcs in the base set
              */
-            List defArcList = defLinkbase.getArcBaseSet();
+            List<Arc> defArcList = defLinkbase.getArcBaseSet();
             assertEquals(2, defArcList.size());
 
             // there must not be a locator for concept b in the base set of arcs
@@ -97,8 +97,8 @@ public final class DTSExtendedLinkbaseTests {
              * there must be one prohibited and one prohibiting arc for the
              * standard extended link role
              */
-            List prohibitedArcs = defLinkbase.getProhibitedArcs();
-            List prohibitingArcs = defLinkbase.getProhibitingArcs();
+            List<Arc> prohibitedArcs = defLinkbase.getProhibitedArcs();
+            List<Arc> prohibitingArcs = defLinkbase.getProhibitingArcs();
             assertEquals(1, prohibitedArcs.size());
             assertEquals(1, prohibitingArcs.size());
 
@@ -118,7 +118,7 @@ public final class DTSExtendedLinkbaseTests {
             PresentationLinkbase presLinkbase = tTaxonomy
                 .getPresentationLinkbase();
 
-            List presXArcList = presLinkbase.getArcBaseSet(
+            List<Arc> presXArcList = presLinkbase.getArcBaseSet(
                 "http://www.xbrl.org/2003/arcrole/parent-child", null);
 
             /* three links all in all, but one is overriden! */
@@ -134,34 +134,34 @@ public final class DTSExtendedLinkbaseTests {
             assertNotNull(xLinkElement1);
 
             /* there are three arcs, but one is overriden! */
-            List targetXLinkElements = presLinkbase
+            List<ExtendedLinkElement> targetXLinkElements = presLinkbase
                 .getTargetExtendedLinkElements(xbrlElement1, null);
             assertEquals(2, targetXLinkElements.size());
 
-            List overriddenArcs = presLinkbase.getOverridenArcs();
+            List<Arc> overriddenArcs = presLinkbase.getOverridenArcs();
             assertNotNull(overriddenArcs);
             assertEquals(1, overriddenArcs.size());
-            assertEquals("Element1_2", ((Arc) overriddenArcs.get(0))
+            assertEquals("Element1_2", overriddenArcs.get(0)
                 .getSourceElement().getLabel());
-            assertEquals("Element3", ((Arc) overriddenArcs.get(0))
+            assertEquals("Element3", overriddenArcs.get(0)
                 .getTargetElement().getLabel());
 
-            List arcList = presLinkbase.getArcBaseSet();
+            List<Arc> arcList = presLinkbase.getArcBaseSet();
             assertEquals(2, arcList.size());
 
             /* test whether the arc points to the right locator! */
-            List targetElementList = presLinkbase
+            List<ExtendedLinkElement> targetElementList = presLinkbase
                 .getTargetExtendedLinkElements(xbrlElement1, null);
             assertEquals(2, targetElementList.size());
-            ExtendedLinkElement lastElement = (ExtendedLinkElement) targetElementList
+            ExtendedLinkElement lastElement = targetElementList
                 .get(1);
             assertEquals("Element3_2", lastElement.getLabel());
 
             /* there must be one overridden link */
-            List overridenLinks = presLinkbase
+            List<Arc> overridenLinks = presLinkbase
                 .getOverridenArcs("http://www.xbrl.org/2003/role/link");
             assertEquals(1, overridenLinks.size());
-            Arc overridenArc = (Arc) overridenLinks.get(0);
+            Arc overridenArc = overridenLinks.get(0);
             assertEquals("Element3", overridenArc.getTargetElement().getLabel());
 
             /*
@@ -195,7 +195,7 @@ public final class DTSExtendedLinkbaseTests {
             Concept element2 = tTaxonomy.getConceptByID("t_Element2");
             Concept element3 = tTaxonomy.getConceptByID("t_Element3");
             Concept element4 = tTaxonomy.getConceptByID("t_Element4");
-            List targetXLinkElements = presLinkbase
+            List<ExtendedLinkElement> targetXLinkElements = presLinkbase
                 .getTargetExtendedLinkElements(element1,
                     "http://www.xbrl.org/2003/role/link_order");
 
@@ -203,18 +203,18 @@ public final class DTSExtendedLinkbaseTests {
             assertEquals(NUMBER_OF_EXPECTED_XLINK_ELEMENTS, targetXLinkElements
                 .size());
 
-            ExtendedLinkElement xLink1 = (ExtendedLinkElement) targetXLinkElements
+            ExtendedLinkElement xLink1 = targetXLinkElements
                 .get(0);
-            ExtendedLinkElement xLink2 = (ExtendedLinkElement) targetXLinkElements
+            ExtendedLinkElement xLink2 = targetXLinkElements
                 .get(1);
-            ExtendedLinkElement xLink3 = (ExtendedLinkElement) targetXLinkElements
+            ExtendedLinkElement xLink3 = targetXLinkElements
                 .get(2);
 
             assertEquals(((Locator) xLink1).getConcept(), element4);
             assertEquals(((Locator) xLink2).getConcept(), element3);
             assertEquals(((Locator) xLink3).getConcept(), element2);
 
-            List presentationLinkbaseElementList = presLinkbase
+            List<PresentationLinkbaseElement> presentationLinkbaseElementList = presLinkbase
                 .getPresentationList(tTaxonomy.getTopTaxonomy().getName(),
                     "http://www.xbrl.org/2003/role/link_order");
 
@@ -222,11 +222,11 @@ public final class DTSExtendedLinkbaseTests {
             assertEquals(NUMBER_OF_EXPECTED_PRES_ELEMENTS,
                 presentationLinkbaseElementList.size());
 
-            PresentationLinkbaseElement presElem1 = (PresentationLinkbaseElement) presentationLinkbaseElementList
+            PresentationLinkbaseElement presElem1 = presentationLinkbaseElementList
                 .get(1);
-            PresentationLinkbaseElement presElem2 = (PresentationLinkbaseElement) presentationLinkbaseElementList
+            PresentationLinkbaseElement presElem2 = presentationLinkbaseElementList
                 .get(2);
-            PresentationLinkbaseElement presElem3 = (PresentationLinkbaseElement) presentationLinkbaseElementList
+            PresentationLinkbaseElement presElem3 = presentationLinkbaseElementList
                 .get(3);
 
             assertEquals(presElem1.getConcept(), element4);
@@ -252,15 +252,15 @@ public final class DTSExtendedLinkbaseTests {
          * fehlerfrei öffnen weil es nicht mehr gegen das Schema validiert, für
          * diesen Test ist das aber ausreichend.
          */
-        List baseList = taxProhibitedLinkDTS2.getDefinitionLinkbase()
+        List<Arc> baseList = taxProhibitedLinkDTS2.getDefinitionLinkbase()
             .getArcBaseSet();
         final int NUMBER_OF_EXPECTED_ELEMENTS = 4;
         assertEquals(NUMBER_OF_EXPECTED_ELEMENTS, baseList.size());
 
-        List prohibitList = taxProhibitedLinkDTS2.getDefinitionLinkbase()
+        List<Arc> prohibitList = taxProhibitedLinkDTS2.getDefinitionLinkbase()
             .getProhibitedArcs();
         assertNull(prohibitList);
-        List overridingList = taxProhibitedLinkDTS2.getDefinitionLinkbase()
+        List<Arc> overridingList = taxProhibitedLinkDTS2.getDefinitionLinkbase()
             .getOverridenArcs();
         assertNull(overridingList);
     }

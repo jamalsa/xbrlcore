@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.jdom.Attribute;
 import org.jdom.Comment;
@@ -97,40 +98,40 @@ public class InstanceOutputter {
      * @return XML structure which is the content of the instance.
      */
     public Document getXML() {
-        Set factSet = instance.getFactSet();
-        Map contextMap = instance.getContextMap();
-        Map unitMap = instance.getUnitMap();
+        Set<Fact> factSet = instance.getFactSet();
+        Map<String, InstanceContext> contextMap = instance.getContextMap();
+        Map<String, InstanceUnit> unitMap = instance.getUnitMap();
 
         Document resultDocument = new Document();
         resultDocument.setRootElement(getRootElement());
         /* set schemaRef elements */
         resultDocument.getRootElement().addContent(getSchemaRefElement());
 
-        Set contextMapEntrySet = contextMap.entrySet();
-        Iterator contextMapIterator = contextMapEntrySet.iterator();
+        Set<Entry<String, InstanceContext>> contextMapEntrySet = contextMap.entrySet();
+        Iterator<Entry<String, InstanceContext>> contextMapIterator = contextMapEntrySet.iterator();
         while (contextMapIterator.hasNext()) {
-            Map.Entry currEntry = (Map.Entry) contextMapIterator.next();
-            InstanceContext currContext = (InstanceContext) currEntry
+            Map.Entry<String, InstanceContext> currEntry = contextMapIterator.next();
+            InstanceContext currContext = currEntry
                     .getValue();
             resultDocument.getRootElement().addContent(
                     getContextElement(currContext));
         }
 
-        Set unitMapEntrySet = unitMap.entrySet();
-        Iterator unitMapIterator = unitMapEntrySet.iterator();
+        Set<Entry<String, InstanceUnit>> unitMapEntrySet = unitMap.entrySet();
+        Iterator<Entry<String, InstanceUnit>> unitMapIterator = unitMapEntrySet.iterator();
         while (unitMapIterator.hasNext()) {
-            Map.Entry currEntry = (Map.Entry) unitMapIterator.next();
-            InstanceUnit currUnit = (InstanceUnit) currEntry.getValue();
+            Map.Entry<String, InstanceUnit> currEntry = unitMapIterator.next();
+            InstanceUnit currUnit = currEntry.getValue();
             resultDocument.getRootElement()
                     .addContent(getUnitElement(currUnit));
         }
         
         //changed by seki : list the facts at the end of the instance
         //to be more xbrl standard compliant (see FRIS-PWD-2007-11-14 - section 2.1.10)
-        Iterator factSetIterator = factSet.iterator();
+        Iterator<Fact> factSetIterator = factSet.iterator();
         while (factSetIterator.hasNext()) {
             resultDocument.getRootElement().addContent(
-                    getFactElement((Fact) factSetIterator.next()));
+                    getFactElement(factSetIterator.next()));
         }
         return resultDocument;
     }
@@ -144,24 +145,24 @@ public class InstanceOutputter {
         rootElement.setNamespace(instance.getInstanceNamespace());
 
         /* add additinal namespace declarations */
-        Set additionalNamespaceMap = instance.getAdditionalNamespaceSet();
-        Iterator additionalNamespaceIterator = additionalNamespaceMap
+        Set<Namespace> additionalNamespaceMap = instance.getAdditionalNamespaceSet();
+        Iterator<Namespace> additionalNamespaceIterator = additionalNamespaceMap
                 .iterator();
         while (additionalNamespaceIterator.hasNext()) {
-            Namespace currNamespace = (Namespace) additionalNamespaceIterator
+            Namespace currNamespace = additionalNamespaceIterator
                     .next();
             rootElement.addNamespaceDeclaration(currNamespace);
         }
 
         /* set value of attribute schemaLocation */
         String schemaLocationValue = "";
-        Map schemaLocationMap = instance.getSchemaLocationMap();
-        Set schemaLocationEntrySet = schemaLocationMap.entrySet();
-        Iterator schemaLocationIterator = schemaLocationEntrySet.iterator();
+        Map<String, String> schemaLocationMap = instance.getSchemaLocationMap();
+        Set<Entry<String, String>> schemaLocationEntrySet = schemaLocationMap.entrySet();
+        Iterator<Entry<String, String>> schemaLocationIterator = schemaLocationEntrySet.iterator();
         while (schemaLocationIterator.hasNext()) {
-            Map.Entry currEntry = (Map.Entry) schemaLocationIterator.next();
-            String schemaURI = (String) currEntry.getKey();
-            String schemaName = (String) currEntry.getValue();
+            Map.Entry<String, String> currEntry = schemaLocationIterator.next();
+            String schemaURI = currEntry.getKey();
+            String schemaName = currEntry.getValue();
             if (schemaLocationValue.length() > 0) {
                 schemaLocationValue += " ";
             }
@@ -179,12 +180,12 @@ public class InstanceOutputter {
      * @return Set of schemaRef elements of the instance document, which points
      *         to the according taxonomies.
      */
-    private Set getSchemaRefElement() {
-        Set schemaRefElementSet = new HashSet();
-        Set dtsSet = instance.getDiscoverableTaxonomySet();
-        Iterator dtsSetIterator = dtsSet.iterator();
+    private Set<Element> getSchemaRefElement() {
+        Set<Element> schemaRefElementSet = new HashSet<Element>();
+        Set<DiscoverableTaxonomySet> dtsSet = instance.getDiscoverableTaxonomySet();
+        Iterator<DiscoverableTaxonomySet> dtsSetIterator = dtsSet.iterator();
         while (dtsSetIterator.hasNext()) {
-            DiscoverableTaxonomySet currDts = (DiscoverableTaxonomySet) dtsSetIterator
+            DiscoverableTaxonomySet currDts = dtsSetIterator
                     .next();
             Element schemaRefElement = new Element("schemaRef");
             schemaRefElement.setNamespace(instance
@@ -332,7 +333,7 @@ public class InstanceOutputter {
         /* set <scenario> and <segment> only when they have child elements */
         Element scenarioElement = new Element("scenario");
         scenarioElement.setNamespace(instance.getInstanceNamespace());
-        Iterator scenarioElementsIterator = context.getScenarioElements()
+        Iterator<Element> scenarioElementsIterator = context.getScenarioElements()
                 .iterator();
         while (scenarioElementsIterator.hasNext()) {
             Element currElement = (Element) scenarioElementsIterator.next();
@@ -341,7 +342,7 @@ public class InstanceOutputter {
 
         Element segmentElement = new Element("segment");
         segmentElement.setNamespace(instance.getInstanceNamespace());
-        Iterator segmentElementsIterator = context.getSegmentElements()
+        Iterator<Element> segmentElementsIterator = context.getSegmentElements()
                 .iterator();
         while (segmentElementsIterator.hasNext()) {
             Element currElement = (Element) segmentElementsIterator.next();
@@ -349,16 +350,16 @@ public class InstanceOutputter {
         }
 
         /* now set dimensional information */
-        List scenSegElementList = new ArrayList();
+        List<Integer> scenSegElementList = new ArrayList<Integer>();
         scenSegElementList.add(0, new Integer(GeneralConstants.DIM_SCENARIO));
         scenSegElementList.add(1, new Integer(GeneralConstants.DIM_SEGMENT));
 
         for (int i = 0; i < scenSegElementList.size(); i++) {
-            int currScenSeg = ((Integer) scenSegElementList.get(i)).intValue();
+            int currScenSeg = scenSegElementList.get(i).intValue();
             if (context.getDimensionalInformation(currScenSeg) != null) {
-                List allDimensionDomain = context.getDimensionalInformation(
+                List<SingleDimensionType> allDimensionDomain = context.getDimensionalInformation(
                         currScenSeg).getAllSingleDimensionTypeList();
-                Iterator allDimensionDomainIterator = allDimensionDomain
+                Iterator<SingleDimensionType> allDimensionDomainIterator = allDimensionDomain
                         .iterator();
                 while (allDimensionDomainIterator.hasNext()) {
                     SingleDimensionType currSDT = (SingleDimensionType) allDimensionDomainIterator

@@ -120,14 +120,14 @@ public final class LabelLinkbaseTest {
         assertNotNull(gvfdiTaxonomy.getLabelLinkbase().getLabel(firstConcept,
             "de", null));
 
-        Set conceptSet = gvfdiTaxonomy.getConcepts();
-        Iterator conceptIterator = conceptSet.iterator();
+        Set<Concept> conceptSet = gvfdiTaxonomy.getConcepts();
+        Iterator<Concept> conceptIterator = conceptSet.iterator();
         while (conceptIterator.hasNext()) {
             Concept currConcept = (Concept) conceptIterator.next();
             assertNull(gvfdiTaxonomy.getLabelLinkbase().getLabel(currConcept,
                 "en", null));
         }
-        Set languageSet = gvfdiTaxonomy.getLabelLinkbase().getLanguageSet();
+        Set<String> languageSet = gvfdiTaxonomy.getLabelLinkbase().getLanguageSet();
         assertEquals(1, languageSet.size());
         assertTrue(gvfdiTaxonomy.getLabelLinkbase().containsLanguage("de"));
         assertFalse(gvfdiTaxonomy.getLabelLinkbase().containsLanguage("en"));

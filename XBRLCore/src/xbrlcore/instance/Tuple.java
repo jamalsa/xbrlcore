@@ -21,9 +21,9 @@ public class Tuple implements Serializable {
 
     private Concept concept;
 
-    private Set factSet = new HashSet();
+    private Set<Fact> factSet = new HashSet<Fact>();
 
-    private Set tupleSet = new HashSet();
+    private Set<Tuple> tupleSet = new HashSet<Tuple>();
 
     private String id;
 

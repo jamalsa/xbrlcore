@@ -25,7 +25,7 @@ public class CalculationValidationException extends InstanceValidationException 
 
 	private BigDecimal calculatedResult;
 
-	private Set calculatedConceptSet;
+	private Set<Concept> calculatedConceptSet;
 
 	private boolean missingValues;
 
@@ -39,7 +39,7 @@ public class CalculationValidationException extends InstanceValidationException 
 	 */
 	public CalculationValidationException(String msg) {
 		super(msg);
-		calculatedConceptSet = new HashSet();
+		calculatedConceptSet = new HashSet<Concept>();
 		missingValues = false;
 	}
 
@@ -87,7 +87,7 @@ public class CalculationValidationException extends InstanceValidationException 
 	/**
 	 * @return Returns the calculatedConceptSet.
 	 */
-	public Set getCalculatedConceptSet() {
+	public Set<Concept> getCalculatedConceptSet() {
 		return calculatedConceptSet;
 	}
 
@@ -95,7 +95,7 @@ public class CalculationValidationException extends InstanceValidationException 
 	 * @param calculatedConceptSet
 	 *            The calculatedConceptSet to set.
 	 */
-	public void setCalculatedConceptSet(Set calculatedConceptSet) {
+	public void setCalculatedConceptSet(Set<Concept> calculatedConceptSet) {
 		this.calculatedConceptSet = calculatedConceptSet;
 	}
 

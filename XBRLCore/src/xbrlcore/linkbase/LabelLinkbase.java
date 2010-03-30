@@ -24,7 +24,7 @@ public class LabelLinkbase extends Linkbase {
 
 	static final long serialVersionUID = 1794952740633234300L;
 
-	private Set languageSet;
+	private Set<String> languageSet;
 
 	/**
 	 * Constructor.
@@ -57,8 +57,8 @@ public class LabelLinkbase extends Linkbase {
 			return null;
 		}
 		Map<String, String> labelMap = new HashMap<String, String>();
-		List possibleResults = getTargetExtendedLinkElements(concept, xbrlExtendedLinkRole);
-		Iterator possibleResultsIterator = possibleResults.iterator();
+		List<ExtendedLinkElement> possibleResults = getTargetExtendedLinkElements(concept, xbrlExtendedLinkRole);
+		Iterator<ExtendedLinkElement> possibleResultsIterator = possibleResults.iterator();
 		while (possibleResultsIterator.hasNext()) {
 			ExtendedLinkElement tmpElement = (ExtendedLinkElement) possibleResultsIterator.next();
 			if (tmpElement.isResource()) {
@@ -91,9 +91,9 @@ public class LabelLinkbase extends Linkbase {
 		if (xbrlExtendedLinkRole == null) {
 			xbrlExtendedLinkRole = GeneralConstants.XBRL_LINKBASE_DEFAULT_LINKROLE;
 		}
-		List possibleResults = getTargetExtendedLinkElements(concept,
+		List<ExtendedLinkElement> possibleResults = getTargetExtendedLinkElements(concept,
 				xbrlExtendedLinkRole);
-		Iterator possibleResultsIterator = possibleResults.iterator();
+		Iterator<ExtendedLinkElement> possibleResultsIterator = possibleResults.iterator();
 		while (possibleResultsIterator.hasNext()) {
 			ExtendedLinkElement tmpElement = (ExtendedLinkElement) possibleResultsIterator
 					.next();
@@ -140,9 +140,9 @@ public class LabelLinkbase extends Linkbase {
 		if (xbrlExtendedLinkRole == null) {
 			xbrlExtendedLinkRole = GeneralConstants.XBRL_LINKBASE_DEFAULT_LINKROLE;
 		}
-		List possibleResults = getTargetExtendedLinkElements(concept,
+		List<ExtendedLinkElement> possibleResults = getTargetExtendedLinkElements(concept,
 				xbrlExtendedLinkRole);
-		Iterator possibleResultsIterator = possibleResults.iterator();
+		Iterator<ExtendedLinkElement> possibleResultsIterator = possibleResults.iterator();
 		while (possibleResultsIterator.hasNext()) {
 			ExtendedLinkElement tmpElement = (ExtendedLinkElement) possibleResultsIterator
 					.next();
@@ -171,11 +171,10 @@ public class LabelLinkbase extends Linkbase {
 	 *         returned.
 	 */
 	public String getLabel(Concept concept, String role) {
-		Set extendedLinkRoles = getExtendedLinkRoles();
-		Iterator extendedLinkRolesIterator = extendedLinkRoles.iterator();
+		Set<String> extendedLinkRoles = getExtendedLinkRoles();
+		Iterator<String> extendedLinkRolesIterator = extendedLinkRoles.iterator();
 		while (extendedLinkRolesIterator.hasNext()) {
-			String currExtendedLinkRole = (String) extendedLinkRolesIterator
-					.next();
+			String currExtendedLinkRole = (String) extendedLinkRolesIterator.next();
 			String tmpLabel = getLabel(concept, null, role,
 					currExtendedLinkRole);
 			if (tmpLabel != null)
@@ -201,12 +200,12 @@ public class LabelLinkbase extends Linkbase {
 	/**
 	 * @return Set of languages of labels used in this label linkbase.
 	 */
-	public Set getLanguageSet() {
+	public Set<String> getLanguageSet() {
 		if (languageSet == null) {
 			/* build language set */
-			languageSet = new HashSet();
-			Set extendedLinkElements = getExtendedLinkElements();
-			Iterator extendedLinkElementsIterator = extendedLinkElements
+			languageSet = new HashSet<String>();
+			Set<ExtendedLinkElement> extendedLinkElements = getExtendedLinkElements();
+			Iterator<ExtendedLinkElement> extendedLinkElementsIterator = extendedLinkElements
 					.iterator();
 			while (extendedLinkElementsIterator.hasNext()) {
 				ExtendedLinkElement currExLinkElement = (ExtendedLinkElement) extendedLinkElementsIterator

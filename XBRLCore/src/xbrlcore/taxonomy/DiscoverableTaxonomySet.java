@@ -39,14 +39,14 @@ public class DiscoverableTaxonomySet implements Serializable {
 
 	private CalculationLinkbase calculationLinkbase;
 
-	private Map taxonomyMap; /* all taxonomies from the DTS */
+	private Map<String, TaxonomySchema> taxonomyMap; /* all taxonomies from the DTS */
 
 	/**
 	 * Constructor.
 	 * 
 	 */
 	public DiscoverableTaxonomySet() {
-		taxonomyMap = new HashMap();
+		taxonomyMap = new HashMap<String, TaxonomySchema>();
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class DiscoverableTaxonomySet implements Serializable {
 	 *         found in any taxonomy of the DTS, null is returned.
 	 */
 	public Concept getConceptByID(String id) {
-		Iterator dtsIterator = taxonomyMap.keySet().iterator();
+		Iterator<String> dtsIterator = taxonomyMap.keySet().iterator();
 		while (dtsIterator.hasNext()) {
 			String currTaxonomyName = (String) dtsIterator.next();
 			TaxonomySchema tmpTaxonomy = (TaxonomySchema) taxonomyMap
@@ -93,7 +93,7 @@ public class DiscoverableTaxonomySet implements Serializable {
 	 *         found in any taxonomy of the DTS, null is returned.
 	 */
 	public Concept getConceptByName(String name) {
-		Iterator dtsIterator = taxonomyMap.keySet().iterator();
+		Iterator<String> dtsIterator = taxonomyMap.keySet().iterator();
 		while (dtsIterator.hasNext()) {
 			String currTaxonomyName = (String) dtsIterator.next();
 			TaxonomySchema tmpTaxonomy = (TaxonomySchema) taxonomyMap
@@ -114,9 +114,9 @@ public class DiscoverableTaxonomySet implements Serializable {
 	 * @return Set with all the concepts of all taxonomies belonging to this
 	 *         DTS.
 	 */
-	public Set getConcepts() {
-		Set returnSet = new HashSet();
-		Iterator dtsIterator = taxonomyMap.keySet().iterator();
+	public Set<Concept> getConcepts() {
+		Set<Concept> returnSet = new HashSet<Concept>();
+		Iterator<String> dtsIterator = taxonomyMap.keySet().iterator();
 		while (dtsIterator.hasNext()) {
 			String currTaxonomyName = (String) dtsIterator.next();
 			TaxonomySchema tmpTaxonomy = (TaxonomySchema) taxonomyMap
@@ -133,9 +133,9 @@ public class DiscoverableTaxonomySet implements Serializable {
 	 * @return map with all the RoleTypes of all taxonomies belonging to this
 	 *         DTS.
 	 */
-	public Map getRoleTypes() {
-		Map returnMap = new HashMap();
-		Iterator dtsIterator = taxonomyMap.keySet().iterator();
+	public Map<String, RoleType> getRoleTypes() {
+		Map<String, RoleType> returnMap = new HashMap<String, RoleType>();
+		Iterator<String> dtsIterator = taxonomyMap.keySet().iterator();
 		while (dtsIterator.hasNext()) {
 			String currTaxonomyName = (String) dtsIterator.next();
 			TaxonomySchema tmpTaxonomy = (TaxonomySchema) taxonomyMap
@@ -153,9 +153,9 @@ public class DiscoverableTaxonomySet implements Serializable {
 	 *            The substitution group all returned concepts shall belong to.
 	 * @return Set of Concept objects of a certain substitution group.
 	 */
-	public Set getConceptBySubstitutionGroup(String substitutionGroup) {
-		Set returnSet = new HashSet();
-		Iterator dtsIterator = taxonomyMap.keySet().iterator();
+	public Set<Concept> getConceptBySubstitutionGroup(String substitutionGroup) {
+		Set<Concept> returnSet = new HashSet<Concept>();
+		Iterator<String> dtsIterator = taxonomyMap.keySet().iterator();
 		while (dtsIterator.hasNext()) {
 			String currTaxonomyName = (String) dtsIterator.next();
 			TaxonomySchema tmpTaxonomy = (TaxonomySchema) taxonomyMap
@@ -229,7 +229,7 @@ public class DiscoverableTaxonomySet implements Serializable {
 	 * @return Set of Concept objects of substitution group
 	 *         xbrldt:dimensionItem.
 	 */
-	public Set getDimensionConceptSet() {
+	public Set<Concept> getDimensionConceptSet() {
 		if (definitionLinkbase == null) {
 			return null;
 		} else {
@@ -331,7 +331,7 @@ public class DiscoverableTaxonomySet implements Serializable {
 	 *         this DTS. The key is the name, the value is the according
 	 *         TaxonomySchema object.
 	 */
-	public Map getTaxonomyMap() {
+	public Map<String, TaxonomySchema> getTaxonomyMap() {
 		return taxonomyMap;
 	}
 

@@ -1,5 +1,9 @@
 package TaxonomyBrowser;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -63,8 +67,9 @@ public abstract class XBRLTableModel extends AbstractTableModel {
     //Obtains taxonomy elements from the XBRL document in the order of the presentation links.
     //Enumeration myenum = null;
     Map<String, String> lAttributes = currentNode.getAttributesMap();
-    Set<String> lKeySet = lAttributes.keySet();    
-    for( String lsAttributeName : lKeySet){    	
+    List<String> lKeyList = new ArrayList(lAttributes.keySet());
+    Collections.sort(lKeyList, String.CASE_INSENSITIVE_ORDER);
+    for( String lsAttributeName : lKeyList){    	
     	String lsAttributeValue = lAttributes.get( lsAttributeName );
 	    listElement.add( lsAttributeName );
 	    listValue.add( lsAttributeValue );
